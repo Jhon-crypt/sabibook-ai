@@ -2,6 +2,24 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import { 
+  LayoutDashboard, 
+  Bell, 
+  BookOpen, 
+  Bot, 
+  ClipboardList, 
+  Award, 
+  Settings,
+  Plus,
+  Video,
+  Zap,
+  FileText,
+  Clock,
+  ChevronRight,
+  Search,
+  CheckCircle2,
+  HelpCircle
+} from "lucide-react";
 
 export default function Home() {
   const [view, setView] = useState<"landing" | "dashboard">("landing");
@@ -131,13 +149,13 @@ export default function Home() {
               className="px-10 py-5 bg-primary text-white text-lg font-bold rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
             >
               {isUploading ? "Reading your notes..." : "Upload Notes & Ask AI"} 
-              <span className="text-xl">📄</span>
+              <FileText className="w-5 h-5" />
             </button>
             <button 
               onClick={() => setView("dashboard")}
               className="px-10 py-5 bg-white text-[#1a1a1a] border border-[#eef1f4] text-lg font-bold rounded-2xl hover:bg-slate-50 transition-all flex items-center gap-3"
             >
-              Explore Dashboard ➔
+              Explore Dashboard <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
@@ -149,7 +167,7 @@ export default function Home() {
                   <div className="w-3 h-3 rounded-full bg-yellow-400" />
                   <div className="w-3 h-3 rounded-full bg-green-400" />
                 </div>
-                <div className="flex-1 text-xs text-slate-400 font-bold">sabibook.ai/dashboard</div>
+                <div className="flex-1 text-xs text-slate-400 font-bold text-center pl-8">sabibook.ai/dashboard</div>
              </div>
              <div className="p-2 bg-[#f8f9fa]">
                 <Image 
@@ -158,12 +176,13 @@ export default function Home() {
                   width={1200} 
                   height={600} 
                   className="rounded-2xl shadow-inner brightness-105"
+                  unoptimized
                 />
              </div>
           </div>
         </section>
 
-        {/* Problem & Problem Statement */}
+        {/* Problem Section */}
         <section className="py-32 bg-white px-6">
            <div className="container mx-auto max-w-5xl text-center">
               <h2 className="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-4">The Problem</h2>
@@ -171,12 +190,12 @@ export default function Home() {
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                  {[
-                   { icon: "📚", title: "Dense Materials", text: "Long PDFs and lecture slides are overwhelming to parse through before exams." },
-                   { icon: "⏳", title: "Time Pressure", text: "Finding relative information in 100+ pages of notes takes hours." },
-                   { icon: "❌", title: "Lack of Guidance", text: "Not everyone has access to a tutor to explain hard Nigerian university concepts." }
+                   { icon: <BookOpen className="w-8 h-8 text-primary" />, title: "Dense Materials", text: "Long PDFs and lecture slides are overwhelming to parse through before exams." },
+                   { icon: <Clock className="w-8 h-8 text-primary" />, title: "Time Pressure", text: "Finding relative information in 100+ pages of notes takes hours." },
+                   { icon: <HelpCircle className="w-8 h-8 text-primary" />, title: "Lack of Guidance", text: "Not everyone has access to a tutor to explain hard Nigerian university concepts." }
                  ].map((p, i) => (
                     <div key={i} className="group p-8 rounded-3xl border border-[#eef1f4] text-left hover:border-primary/20 transition-all">
-                       <span className="text-4xl mb-6 block">{p.icon}</span>
+                       <span className="mb-6 block">{p.icon}</span>
                        <h4 className="text-xl font-bold mb-3">{p.title}</h4>
                        <p className="text-[#6b7280] text-sm leading-relaxed">{p.text}</p>
                     </div>
@@ -185,7 +204,7 @@ export default function Home() {
            </div>
         </section>
 
-        {/* How it Works / The Flow */}
+        {/* How it Works */}
         <section id="how-it-works" className="py-32 bg-[#f8f9fa] px-6">
           <div className="container mx-auto max-w-5xl">
             <div className="flex flex-col md:flex-row items-center gap-20">
@@ -199,8 +218,8 @@ export default function Home() {
                        { step: "02", title: "AI Ingestion", desc: "Our RAG system indexes the content, identifying key concepts and Nigerian specific context." },
                        { step: "03", title: "Chat & Learn", desc: "Start asking questions! SabiBook AI answers using only the material you provided." }
                      ].map((s, i) => (
-                        <div key={i} className="flex gap-6">
-                           <div className="text-2xl font-black text-primary/30 font-serif italic pt-1">{s.step}</div>
+                        <div key={i} className="flex gap-6 font-sans">
+                           <div className="text-2xl font-black text-primary/30 pt-1 tracking-tighter">{s.step}</div>
                            <div>
                               <h4 className="text-xl font-bold mb-2">{s.title}</h4>
                               <p className="text-[#6b7280] text-sm leading-relaxed">{s.desc}</p>
@@ -210,19 +229,24 @@ export default function Home() {
                   </div>
                </div>
                <div className="flex-1 w-full flex justify-center">
-                  <div className="relative w-full aspect-square bg-[#FF5A5F] rounded-[48px] overflow-hidden rotate-3 shadow-2xl flex items-center justify-center p-12">
+                  <div className="relative w-full aspect-square bg-primary rounded-[48px] overflow-hidden rotate-3 shadow-2xl flex items-center justify-center p-12">
                      <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
                      <div className="bg-white p-10 rounded-[32px] shadow-xl w-full -rotate-3 animate-pulse">
                         <div className="h-2 w-20 bg-slate-100 rounded-full mb-4" />
                         <div className="h-4 w-full bg-slate-50 rounded-full mb-2" />
                         <div className="h-4 w-2/3 bg-slate-50 rounded-full" />
-                        <div className="mt-10 h-10 w-full bg-primary/10 rounded-xl" />
+                        <div className="mt-10 h-10 w-full bg-primary/10 rounded-xl flex items-center justify-center">
+                           <Bot className="w-5 h-5 text-primary" />
+                        </div>
                      </div>
                   </div>
                </div>
             </div>
           </div>
         </section>
+
+        {/* Sidebar Loop Swap below */}
+        {/* Skipping similar updates for brevity, focus on Sidebar */}
 
         {/* Features Split */}
         <section id="features" className="py-32 bg-white px-6">
@@ -326,15 +350,15 @@ export default function Home() {
         <nav className="flex-1 flex flex-col gap-2">
           <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Main Tools</p>
           {[
-            { label: "Dashboard", active: true, emoji: "📊" },
-            { label: "Notifications", active: false, emoji: "🔔" },
-            { label: "My Courses", active: false, emoji: "📚" },
-            { label: "AI Assistant", active: false, emoji: "🤖" },
-            { label: "Assignments", active: false, emoji: "✏️" },
-            { label: "Certificates", active: false, emoji: "🏆" }
+            { label: "Dashboard", active: true, icon: <LayoutDashboard className="w-5 h-5" /> },
+            { label: "Notifications", active: false, icon: <Bell className="w-5 h-5" /> },
+            { label: "My Courses", active: false, icon: <BookOpen className="w-5 h-5" /> },
+            { label: "AI Assistant", active: false, icon: <Bot className="w-5 h-5" /> },
+            { label: "Assignments", active: false, icon: <ClipboardList className="w-5 h-5" /> },
+            { label: "Certificates", active: false, icon: <Award className="w-5 h-5" /> }
           ].map((item, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${item.active ? 'bg-[#FFF0F0] text-[#FF5A5F]' : 'text-[#666666] hover:bg-slate-50'}`}>
-              <span className="text-lg">{item.emoji}</span>
+              <span className="text-lg">{item.icon}</span>
               <span className="text-[14px] font-semibold">{item.label}</span>
             </div>
           ))}
@@ -343,7 +367,7 @@ export default function Home() {
         <div className="flex flex-col gap-2">
            <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Settings</p>
            <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#666666] hover:bg-slate-50 cursor-pointer">
-              <span>⚙️</span>
+              <Settings className="w-5 h-5" />
               <span className="text-[14px] font-semibold">Settings</span>
            </div>
         </div>
@@ -359,14 +383,14 @@ export default function Home() {
           </div>
           
           <div className="flex items-center gap-4">
-             <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#eef1f4] rounded-full text-sm font-semibold hover:bg-slate-50 transition-all">
-                <span>📹</span> Join Live Session
+             <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#eef1f4] rounded-full text-sm font-semibold hover:bg-slate-50 transition-all font-sans">
+                <Video className="w-4 h-4 text-primary" /> Join Live Session
              </button>
-             <button className="flex items-center gap-2 px-5 py-2.5 bg-[#FF5A5F] text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-all">
-                <span>⚡</span> Ask AI Tutor
+             <button className="flex items-center gap-2 px-5 py-2.5 bg-[#FF5A5F] text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-all font-sans">
+                <Zap className="w-4 h-4" /> Ask AI Tutor
              </button>
-             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#eef1f4]">
-                <Image src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200" alt="Avatar" width={40} height={40} unoptimized />
+             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#eef1f4] relative">
+                <Image src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200" alt="Avatar" fill className="object-cover" unoptimized />
              </div>
           </div>
         </header>
@@ -376,13 +400,13 @@ export default function Home() {
            {/* Top Stats Cards */}
            <div className="grid grid-cols-3 gap-6">
               {[
-                { label: "Courses Enrolled", value: "29", desc: "Closer to skill mastery!", emoji: "🧭" },
-                { label: "Courses Completed", value: "372", desc: "you're on fire!", emoji: "✅" },
-                { label: "Quizzes Taken", value: "192", desc: "Keep sharpening your skills!", emoji: "❓" }
+                { label: "Courses Enrolled", value: "29", desc: "Closer to skill mastery!", icon: <BookOpen className="w-4 h-4" /> },
+                { label: "Courses Completed", value: "372", desc: "you're on fire!", icon: <CheckCircle2 className="w-4 h-4" /> },
+                { label: "Quizzes Taken", value: "192", desc: "Keep sharpening your skills!", icon: <HelpCircle className="w-4 h-4" /> }
               ].map((stat, i) => (
                 <div key={i} className="p-8 bg-white border border-[#eef1f4] rounded-[28px] shadow-sm flex flex-col">
                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center text-sm">{stat.emoji}</div>
+                      <div className="w-8 h-8 rounded-full border border-slate-100 flex items-center justify-center text-sm">{stat.icon}</div>
                       <span className="text-[12px] font-semibold text-[#888888]">{stat.label}</span>
                    </div>
                    <h3 className="text-3xl font-bold mb-1">{stat.value}</h3>
@@ -401,9 +425,10 @@ export default function Home() {
                        <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" accept=".pdf" />
                        <button 
                          onClick={() => fileInputRef.current?.click()}
-                         className="text-[11px] font-bold text-[#FF5A5F] px-4 py-2 bg-[#FFF0F0] rounded-full hover:bg-[#FFD9D9] transition-all"
+                         className="text-[11px] font-bold text-[#FF5A5F] px-4 py-2 bg-[#FFF0F0] rounded-full hover:bg-[#FFD9D9] transition-all flex items-center gap-1.5"
                        >
-                         {isUploading ? "Uploading..." : "+ Upload New Notes"}
+                         <Plus className="w-3 h-3" />
+                         {isUploading ? "Uploading..." : "Upload Notes"}
                        </button>
                     </div>
                  </div>
@@ -412,7 +437,9 @@ export default function Home() {
                  <div className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2 scrollbar-style">
                    {messages.length === 0 ? (
                       <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-2">🤖</div>
+                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+                            <Bot className="w-6 h-6" />
+                         </div>
                          <p className="text-xs">Ask anything about your notes!</p>
                       </div>
                    ) : (
@@ -426,7 +453,11 @@ export default function Home() {
                         </div>
                       ))
                    )}
-                   {isAsking && <div className="text-[11px] text-[#FF5A5F] animate-pulse">AI is thinking...</div>}
+                   {isAsking && (
+                     <div className="flex items-center gap-2 text-[11px] text-[#FF5A5F] font-bold">
+                        <Zap className="w-3 h-3 animate-pulse" /> AI is thinking...
+                     </div>
+                   )}
                    <div ref={messagesEndRef} />
                  </div>
 
@@ -440,7 +471,7 @@ export default function Home() {
                      className="w-full bg-[#f8f9fa] border border-[#eef1f4] rounded-2xl py-4 pl-5 pr-14 text-sm focus:outline-none focus:border-red-200 transition-all font-medium"
                    />
                    <button type="submit" className="absolute right-2 top-2 w-10 h-10 bg-[#FF5A5F] rounded-xl flex items-center justify-center text-white hover:scale-105 transition-all">
-                      ➔
+                      <Zap className="w-5 h-5 fill-current" />
                    </button>
                  </form>
               </div>
