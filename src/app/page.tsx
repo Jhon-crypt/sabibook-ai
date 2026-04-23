@@ -418,8 +418,8 @@ export default function Home() {
            {/* Second Row: Charts and Schedules */}
            <div className="grid grid-cols-2 gap-6">
               {/* AI Study Assistant Feature Box */}
-              <div className="p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col h-[400px]">
-                 <div className="flex items-center justify-between mb-6">
+              <div className="p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col h-[450px]">
+                 <div className="flex items-center justify-between mb-4">
                     <span className="text-[14px] font-bold">AI Study Assistant</span>
                     <div className="flex items-center gap-2">
                        <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" accept=".pdf" />
@@ -431,6 +431,27 @@ export default function Home() {
                          {isUploading ? "Uploading..." : "Upload Notes"}
                        </button>
                     </div>
+                 </div>
+
+                 {/* Feature Buttons */}
+                 <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+                    {[
+                      { id: "summary", label: "Summarize", icon: <Zap className="w-3 h-3" />, color: "bg-amber-50 text-amber-600 border-amber-100" },
+                      { id: "quiz", label: "Generate Quiz", icon: <ClipboardList className="w-3 h-3" />, color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
+                      { id: "simple", label: "Explain Simply", icon: <Bot className="w-3 h-3" />, color: "bg-teal-50 text-teal-600 border-teal-100" },
+                    ].map((btn) => (
+                      <button
+                        key={btn.id}
+                        onClick={() => {
+                          if (btn.id === "summary") setQuestion("Can you summarize my uploaded notes into key bullet points?");
+                          if (btn.id === "quiz") setQuestion("Generate 5 practice exam questions from these notes with suggested answers.");
+                          if (btn.id === "simple") setQuestion("Explain the main concepts of these notes like I'm 5 years old, using simple Nigerian context.");
+                        }}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold whitespace-nowrap transition-all hover:scale-105 active:scale-95 ${btn.color}`}
+                      >
+                        {btn.icon} {btn.label}
+                      </button>
+                    ))}
                  </div>
 
                  {/* Chat Messages */}
