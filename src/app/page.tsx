@@ -8,7 +8,17 @@ import {
   FileText,
   Clock,
   ChevronRight,
-  HelpCircle
+  HelpCircle,
+  Sparkles,
+  ShieldCheck,
+  Zap,
+  CheckCircle2,
+  Users,
+  MessageSquare,
+  Rocket,
+  Award,
+  Globe,
+  ArrowRight
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -22,134 +32,207 @@ export default function LandingPage() {
           </div>
           <span className="text-xl font-bold tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
         </Link>
-        <div className="hidden md:flex items-center gap-10 text-sm font-semibold text-[#666666]">
+        <div className="hidden lg:flex items-center gap-10 text-[13px] font-bold text-[#666666] uppercase tracking-wider">
           <a href="#how-it-works" className="hover:text-primary transition-colors">How it works</a>
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
-          <a href="#success" className="hover:text-primary transition-colors">Success Stories</a>
+          <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
+          <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="text-sm font-bold text-[#666666] hover:text-primary transition-colors">Login</Link>
+          <Link href="/login" className="text-sm font-bold text-[#666666] hover:text-primary transition-colors hidden sm:block">Login</Link>
           <Link 
             href="/signup"
-            className="px-6 py-2.5 bg-primary text-white text-sm font-bold rounded-full shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all"
+            className="px-6 py-3 bg-primary text-white text-sm font-bold rounded-full shadow-lg shadow-primary/30 hover:scale-105 active:scale-95 transition-all"
           >
-            Start Learning
+            Get Started
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-40 pb-20 px-6 container mx-auto text-center flex flex-col items-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-red-50 border border-red-100 text-primary text-[11px] font-bold uppercase tracking-widest mb-8 animate-slide-up">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-          </span>
-          Built for Nigerian University Students
+      <section className="pt-48 pb-20 px-6 container mx-auto text-center flex flex-col items-center relative">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-[100px] -z-10" />
+        
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white border border-[#eef1f4] shadow-sm text-[#666666] text-[11px] font-bold uppercase tracking-widest mb-8 animate-slide-up">
+           <span className="bg-primary text-white px-2 py-0.5 rounded text-[9px]">NEW</span>
+           AI-Powered Revision Tools for 2026
         </div>
         
-        <h1 className="text-5xl md:text-8xl font-bold tracking-tight mb-8 leading-[1.1] animate-slide-up [animation-delay:0.1s]">
-          Turn your static notes into <br />
-          <span className="text-primary italic">interactive intelligence.</span>
+        <h1 className="text-6xl md:text-[100px] font-black tracking-tight mb-8 leading-[0.9] animate-slide-up [animation-delay:0.1s]">
+          Master your <br />
+          <span className="text-primary italic relative">
+             Curriculum.
+             <div className="absolute -bottom-2 left-0 w-full h-3 bg-primary/10 -rotate-1 -z-10" />
+          </span>
         </h1>
         
-        <p className="text-lg md:text-xl text-[#6b7280] max-w-2xl mb-12 animate-slide-up [animation-delay:0.2s] leading-relaxed">
-          Stop struggling with dense lecture materials. SabiBook AI processes your PDFs and lets you chat with your notes—summarizing, explaining, and testing your knowledge.
+        <p className="text-lg md:text-xl text-[#6b7280] max-w-2xl mb-12 animate-slide-up [animation-delay:0.2s] leading-relaxed font-medium">
+          SabiBook AI turns your heavy lecture PDFs into a smart personal tutor. Chat with your notes, get instant summaries, and ace your exams with confidence.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 mb-20 animate-slide-up [animation-delay:0.3s]">
+        <div className="flex flex-col sm:flex-row gap-5 mb-24 animate-slide-up [animation-delay:0.3s]">
           <Link 
             href="/signup"
-            className="px-10 py-5 bg-primary text-white text-lg font-bold rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
+            className="px-12 py-5 bg-[#1a1a1a] text-white text-lg font-bold rounded-2xl shadow-2xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3"
           >
-            Get Started for Free
+            Start Learning Free
           </Link>
           <Link 
-            href="/login"
-            className="px-10 py-5 bg-white text-[#1a1a1a] border border-[#eef1f4] text-lg font-bold rounded-2xl hover:bg-slate-50 transition-all flex items-center gap-3"
+            href="#how-it-works"
+            className="px-12 py-5 bg-white text-[#1a1a1a] border border-[#eef1f4] text-lg font-bold rounded-2xl hover:bg-slate-50 transition-all flex items-center gap-3"
           >
-            Login <ChevronRight className="w-5 h-5" />
+            See how it works
           </Link>
         </div>
 
-        {/* Hero Visual (Dashboard Preview Mock) */}
-        <div className="relative w-full max-w-5xl rounded-[32px] border border-[#eef1f4] bg-white shadow-2xl overflow-hidden animate-slide-up [animation-delay:0.4s]">
-           <div className="bg-slate-50/50 p-4 border-b border-[#eef1f4] flex items-center gap-2">
-              <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-              </div>
-              <div className="flex-1 text-xs text-slate-400 font-bold text-center pl-8">sabibook.ai/dashboard</div>
-           </div>
-           <div className="p-2 bg-[#f8f9fa]">
+        {/* Hero Visual */}
+        <div className="relative w-full max-w-6xl rounded-[40px] border border-[#eef1f4] bg-white p-3 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden animate-slide-up [animation-delay:0.4s]">
+           <div className="rounded-[32px] overflow-hidden bg-slate-50 relative aspect-[16/9] md:aspect-auto">
               <Image 
-                src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1200" 
+                src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=1400" 
                 alt="Dashboard Preview" 
-                width={1200} 
-                height={600} 
-                className="rounded-2xl shadow-inner brightness-105"
+                width={1400} 
+                height={800} 
+                className="w-full h-full object-cover brightness-[1.02]"
                 unoptimized
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+              
+              {/* Floating UI Elements */}
+              <div className="absolute top-10 left-10 p-5 bg-white/90 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 max-w-[200px] text-left hidden md:block animate-float">
+                 <div className="flex items-center gap-2 mb-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Analysis Complete</span>
+                 </div>
+                 <p className="text-[12px] font-bold text-[#1a1a1a]">"GST 101 Summary generated. 12 key points identified."</p>
+              </div>
+
+              <div className="absolute bottom-10 right-10 p-5 bg-primary rounded-2xl shadow-xl text-white max-w-[220px] text-left hidden md:block animate-float [animation-delay:1s]">
+                 <Bot className="w-6 h-6 mb-3" />
+                 <p className="text-[13px] font-bold leading-tight">"Ask me anything about the laws of thermodynamics in simple terms."</p>
+              </div>
            </div>
         </div>
       </section>
 
-      {/* Problem Section */}
-      <section className="py-32 bg-white px-6">
-         <div className="container mx-auto max-w-5xl text-center">
-            <h2 className="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-4">The Problem</h2>
-            <h3 className="text-4xl md:text-5xl font-bold mb-16 tracking-tight">Why traditional studying feels like a chore.</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-               {[
-                 { icon: <BookOpen className="w-8 h-8 text-primary" />, title: "Dense Materials", text: "Long PDFs and lecture slides are overwhelming to parse through before exams." },
-                 { icon: <Clock className="w-8 h-8 text-primary" />, title: "Time Pressure", text: "Finding relative information in 100+ pages of notes takes hours." },
-                 { icon: <HelpCircle className="w-8 h-8 text-primary" />, title: "Lack of Guidance", text: "Not everyone has access to a tutor to explain hard Nigerian university concepts." }
-               ].map((p, i) => (
-                  <div key={i} className="group p-8 rounded-3xl border border-[#eef1f4] text-left hover:border-primary/20 transition-all">
-                     <span className="mb-6 block">{p.icon}</span>
-                     <h4 className="text-xl font-bold mb-3">{p.title}</h4>
-                     <p className="text-[#6b7280] text-sm leading-relaxed">{p.text}</p>
-                  </div>
-               ))}
+      {/* Trust Badges */}
+      <section className="py-20 border-y border-[#eef1f4] bg-white">
+         <div className="container mx-auto px-6 text-center">
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 mb-10">Trusted by students across</p>
+            <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-700 font-serif italic font-bold text-xl">
+               <span>UNILAG</span>
+               <span>LASU</span>
+               <span>UI</span>
+               <span>OAU</span>
+               <span>LASUSTECH</span>
+               <span>ABU</span>
             </div>
          </div>
       </section>
 
-      {/* How it Works */}
-      <section id="how-it-works" className="py-32 bg-[#f8f9fa] px-6">
-        <div className="container mx-auto max-w-5xl">
-          <div className="flex flex-col md:flex-row items-center gap-20">
-             <div className="flex-1 text-left">
-                <h2 className="text-sm font-bold text-primary uppercase tracking-[0.2em] mb-4">How it works</h2>
-                <h3 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight">It’s like ChatGPT, but trained on your own notes.</h3>
+      {/* Problem Section */}
+      <section className="py-32 bg-white px-6">
+         <div className="container mx-auto max-w-6xl">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+               <div>
+                  <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">The Old Way</h2>
+                  <h3 className="text-5xl md:text-6xl font-bold mb-10 tracking-tight leading-[1.1]">Traditional studying is broken.</h3>
+                  <p className="text-lg text-[#6b7280] mb-12 leading-relaxed">
+                     Nigerian lecture notes are often dense, outdated, and overwhelming. Spending hours highlighting paper and rewriting notes is a waste of your brainpower.
+                  </p>
+                  <div className="space-y-6">
+                     {[
+                        { title: "Manual Parsing", desc: "Hours spent reading just to find one definition." },
+                        { title: "No Interaction", desc: "Notes can't talk back or explain themselves." },
+                        { title: "Static Content", desc: "Hard to test your knowledge without someone to quiz you." }
+                     ].map((item, i) => (
+                        <div key={i} className="flex gap-4">
+                           <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center shrink-0 mt-1">
+                              <div className="w-2 h-2 rounded-full bg-primary" />
+                           </div>
+                           <div>
+                              <h4 className="font-bold text-[#1a1a1a]">{item.title}</h4>
+                              <p className="text-sm text-[#6b7280]">{item.desc}</p>
+                           </div>
+                        </div>
+                     ))}
+                  </div>
+               </div>
+               <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-6">
+                     <div className="aspect-[4/5] bg-slate-50 rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden group">
+                        <BookOpen className="w-10 h-10 text-slate-300 absolute top-8 left-8" />
+                        <h5 className="font-bold text-lg leading-tight">100+ Page <br />Handouts</h5>
+                     </div>
+                     <div className="aspect-square bg-[#FFF0F0] rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden">
+                        <Clock className="w-10 h-10 text-primary/30 absolute top-8 left-8" />
+                        <h5 className="font-bold text-lg leading-tight">Midnight <br />Cramming</h5>
+                     </div>
+                  </div>
+                  <div className="space-y-6 pt-12">
+                     <div className="aspect-square bg-slate-900 rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden text-white">
+                        <Bot className="w-10 h-10 text-white/20 absolute top-8 left-8" />
+                        <h5 className="font-bold text-lg leading-tight">Zero <br />AI Help</h5>
+                     </div>
+                     <div className="aspect-[4/5] bg-slate-50 rounded-3xl p-8 flex flex-col justify-end relative overflow-hidden">
+                        <HelpCircle className="w-10 h-10 text-slate-300 absolute top-8 left-8" />
+                        <h5 className="font-bold text-lg leading-tight">Unanswered <br />Questions</h5>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
+      {/* How it Works - Split Scroll Experience */}
+      <section id="how-it-works" className="py-32 bg-[#1a1a1a] text-white px-6 overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <div className="flex flex-col lg:flex-row items-center gap-24">
+             <div className="flex-1">
+                <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">The Process</h2>
+                <h3 className="text-5xl md:text-6xl font-bold mb-12 tracking-tight leading-[1.1]">Three steps to <br /><span className="text-primary italic">academic freedom.</span></h3>
                 
-                <div className="space-y-12">
+                <div className="space-y-16">
                    {[
-                     { step: "01", title: "Upload Notes", desc: "Drag and drop your lecture PDFs or copy-paste text directly into the dashboard." },
-                     { step: "02", title: "AI Ingestion", desc: "Our RAG system indexes the content, identifying key concepts and Nigerian specific context." },
-                     { step: "03", title: "Chat & Learn", desc: "Start asking questions! SabiBook AI answers using only the material you provided." }
+                     { step: "01", title: "Upload your Materials", desc: "Drag and drop your lecture PDFs, slides, or even photos of your handwritten notes." },
+                     { step: "02", title: "AI Brain Mapping", desc: "Our neural engine scans and understands the core concepts, terminologies, and context of your material." },
+                     { step: "03", title: "Chat with your Notes", desc: "Ask 'Explain this in simple terms' or 'Generate a 10-question quiz'. Your notes are now interactive." }
                    ].map((s, i) => (
-                      <div key={i} className="flex gap-6 font-sans">
-                         <div className="text-2xl font-black text-primary/30 pt-1 tracking-tighter">{s.step}</div>
+                      <div key={i} className="flex gap-8 group">
+                         <div className="text-5xl font-black text-white/5 pt-1 group-hover:text-primary/20 transition-colors duration-500">{s.step}</div>
                          <div>
-                            <h4 className="text-xl font-bold mb-2">{s.title}</h4>
-                            <p className="text-[#6b7280] text-sm leading-relaxed">{s.desc}</p>
+                            <h4 className="text-2xl font-bold mb-3">{s.title}</h4>
+                            <p className="text-slate-400 text-lg leading-relaxed">{s.desc}</p>
                          </div>
                       </div>
                    ))}
                 </div>
              </div>
-             <div className="flex-1 w-full flex justify-center">
-                <div className="relative w-full aspect-square bg-primary rounded-[48px] overflow-hidden rotate-3 shadow-2xl flex items-center justify-center p-12">
-                   <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
-                   <div className="bg-white p-10 rounded-[32px] shadow-xl w-full -rotate-3 animate-pulse">
-                      <div className="h-2 w-20 bg-slate-100 rounded-full mb-4" />
-                      <div className="h-4 w-full bg-slate-50 rounded-full mb-2" />
-                      <div className="h-4 w-2/3 bg-slate-50 rounded-full" />
-                      <div className="mt-10 h-10 w-full bg-primary/10 rounded-xl flex items-center justify-center">
-                         <Bot className="w-5 h-5 text-primary" />
+             <div className="flex-1 relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-[120px]" />
+                <div className="relative bg-slate-800/50 backdrop-blur-2xl border border-white/10 rounded-[48px] p-10 shadow-2xl">
+                   <div className="space-y-6">
+                      <div className="flex gap-4 items-start">
+                         <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center shrink-0">
+                            <Users className="w-5 h-5 text-slate-400" />
+                         </div>
+                         <div className="bg-slate-700/50 p-4 rounded-2xl text-[14px] font-medium leading-relaxed max-w-[80%]">
+                            "Can you explain the difference between Micro and Macro economics using examples from the Nigerian market?"
+                         </div>
+                      </div>
+                      <div className="flex gap-4 items-start flex-row-reverse">
+                         <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
+                            <Bot className="w-5 h-5 text-white" />
+                         </div>
+                         <div className="bg-primary/10 border border-primary/20 p-5 rounded-2xl text-[14px] font-medium leading-relaxed max-w-[80%]">
+                            "Think of Micro as your personal savings (pata-pata), while Macro is the entire Nigerian economy (Naira devaluation, CBN policies). In your notes, the lecturer highlights that..."
+                         </div>
+                      </div>
+                      <div className="pt-10 flex justify-center">
+                         <div className="animate-pulse flex items-center gap-2 px-4 py-2 bg-primary/20 rounded-full border border-primary/30">
+                            <Sparkles className="w-3 h-3 text-primary" />
+                            <span className="text-[10px] font-black uppercase tracking-widest text-primary">AI Thinking...</span>
+                         </div>
                       </div>
                    </div>
                 </div>
@@ -158,89 +241,187 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Split */}
+      {/* Features Showcase */}
       <section id="features" className="py-32 bg-white px-6">
-         <div className="container mx-auto max-w-6xl">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-               <div className="p-12 rounded-[48px] bg-slate-900 text-white flex flex-col justify-between aspect-square group overflow-hidden relative">
-                  <div className="absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000" />
-                  <div>
-                     <span className="text-5xl mb-6 block">⚡</span>
-                     <h3 className="text-4xl font-bold mb-6 italic leading-tight">Instant Summaries <br />at your fingertips.</h3>
-                     <p className="text-slate-400 text-lg leading-relaxed">Turn a 40-page PDF into a 5-bullet point summary in under 2 seconds. Perfect for last-minute revisions.</p>
+         <div className="container mx-auto max-w-6xl text-center mb-24">
+            <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">Features</h2>
+            <h3 className="text-5xl md:text-6xl font-bold tracking-tight">Everything you need <br />to graduate with honors.</h3>
+         </div>
+         
+         <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+               { icon: <Zap className="w-8 h-8 text-amber-500" />, title: "Instant Summaries", desc: "Convert 50 pages into 5 key points. Perfect for quick reviews before entering the hall." },
+               { icon: <CheckCircle2 className="w-8 h-8 text-green-500" />, title: "Quiz Generator", desc: "Let AI test you. Automatically generate exam-style questions from your own materials." },
+               { icon: <Globe className="w-8 h-8 text-blue-500" />, title: "Nigerian Context", desc: "SabiBook AI understands local academic slang and standard Nigerian curriculum structures." },
+               { icon: <Rocket className="w-8 h-8 text-teal-500" />, title: "Revision Paths", desc: "Get a personalized study plan based on how much of the syllabus you've actually covered." },
+               { icon: <ShieldCheck className="w-8 h-8 text-indigo-500" />, title: "Privacy First", desc: "Your notes are your intellectual property. We encrypt and secure every upload." },
+               { icon: <Users className="w-8 h-8 text-primary" />, title: "Collaborative Study", desc: "Share your AI-enhanced notes with course-mates to learn together (Coming Soon)." }
+            ].map((f, i) => (
+               <div key={i} className="p-10 rounded-[32px] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:border-transparent transition-all group duration-500">
+                  <div className="mb-8 w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                     {f.icon}
                   </div>
-                  <div className="mt-8 flex gap-2">
-                     <div className="h-1.5 w-12 bg-primary rounded-full" />
-                     <div className="h-1.5 w-4 bg-slate-800 rounded-full" />
-                     <div className="h-1.5 w-4 bg-slate-800 rounded-full" />
-                  </div>
+                  <h4 className="text-2xl font-bold mb-4">{f.title}</h4>
+                  <p className="text-slate-500 leading-relaxed text-sm">{f.desc}</p>
                </div>
+            ))}
+         </div>
+      </section>
 
-               <div className="p-12 rounded-[48px] bg-[#FFF0F0] border border-red-50 flex flex-col justify-between aspect-square group cursor-pointer hover:bg-white transition-all duration-500">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-32 bg-[#f8f9fa] px-6 relative">
+         <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-24">
+               <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">Pricing</h2>
+               <h3 className="text-5xl md:text-6xl font-bold tracking-tight">Built by students, <br />for students.</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+               <div className="p-12 rounded-[40px] bg-white border border-[#eef1f4] flex flex-col justify-between group">
                   <div>
-                     <span className="text-5xl mb-6 block">🇳🇬</span>
-                     <h3 className="text-4xl font-bold mb-6 italic leading-tight text-[#1a1a1a]">Simplified <br />Explaining.</h3>
-                     <p className="text-slate-600 text-lg leading-relaxed">Hard concepts explained in simple Nigerian academic context. No robotic jargon—just pure 'Sabi'.</p>
+                     <h4 className="text-2xl font-bold mb-2">Student Plan</h4>
+                     <p className="text-[#6b7280] mb-8">Everything you need to sabi.</p>
+                     <div className="text-5xl font-black mb-10 text-[#1a1a1a]">₦0 <span className="text-lg font-bold text-slate-300">/ Free Forever</span></div>
+                     <ul className="space-y-4 mb-12">
+                        {["Up to 50 PDFs/month", "Unlimited AI Chat", "Basic Summaries", "Community Support"].map((item, i) => (
+                           <li key={i} className="flex items-center gap-3 text-sm font-semibold text-[#666666]">
+                              <CheckCircle2 className="w-4 h-4 text-green-500" /> {item}
+                           </li>
+                        ))}
+                     </ul>
                   </div>
-                  <div className="flex items-center gap-4 py-4 px-6 bg-white rounded-2xl shadow-sm self-start">
-                     <span className="text-primary font-bold">Ask:</span>
-                     <span className="text-sm font-semibold">"Explain this like I de 100 Level"</span>
+                  <Link href="/signup" className="w-full py-5 bg-slate-50 text-[#1a1a1a] font-bold rounded-2xl text-center group-hover:bg-[#1a1a1a] group-hover:text-white transition-all">Start for Free</Link>
+               </div>
+               <div className="p-12 rounded-[40px] bg-white border-2 border-primary relative overflow-hidden flex flex-col justify-between">
+                  <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black px-5 py-2 uppercase tracking-widest rounded-bl-2xl">Recommended</div>
+                  <div>
+                     <h4 className="text-2xl font-bold mb-2 text-primary">Sabi Pro</h4>
+                     <p className="text-[#6b7280] mb-8">For the serious high-achievers.</p>
+                     <div className="text-5xl font-black mb-10 text-[#1a1a1a]">₦2,500 <span className="text-lg font-bold text-slate-300">/ Session</span></div>
+                     <ul className="space-y-4 mb-12">
+                        {["Unlimited PDF Uploads", "Priority AI Responses", "Exam Pattern Analytics", "Advanced Quiz Generation", "Custom Study Paths"].map((item, i) => (
+                           <li key={i} className="flex items-center gap-3 text-sm font-semibold text-[#1a1a1a]">
+                              <CheckCircle2 className="w-4 h-4 text-primary" /> {item}
+                           </li>
+                        ))}
+                     </ul>
                   </div>
+                  <Link href="/signup" className="w-full py-5 bg-primary text-white font-bold rounded-2xl text-center shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">Go Pro Now</Link>
                </div>
             </div>
          </div>
       </section>
 
-      {/* Call to Action */}
+      {/* FAQ Section */}
+      <section id="faq" className="py-32 bg-white px-6">
+         <div className="container mx-auto max-w-4xl">
+            <div className="text-center mb-24">
+               <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">FAQ</h2>
+               <h3 className="text-5xl font-bold tracking-tight">Common questions.</h3>
+            </div>
+            
+            <div className="space-y-6">
+               {[
+                  { q: "Is SabiBook AI legal to use in my university?", a: "Absolutely! We are a study aid designed to help you understand your own materials. We encourage academic integrity and do not support plagiarism." },
+                  { q: "What types of files can I upload?", a: "Currently, we support PDF files, but we are working on adding support for .doc, .ppt, and even handwritten image uploads." },
+                  { q: "How accurate is the AI?", a: "SabiBook AI uses state-of-the-art RAG technology, meaning it only answers based on the text you provide. This significantly reduces hallucinations and ensures high accuracy." },
+                  { q: "Can I use it for professional exams (ICAN, etc.)?", a: "Yes! Many students use SabiBook for professional certification materials to help them summarize dense legal or accounting texts." }
+               ].map((faq, i) => (
+                  <div key={i} className="p-8 rounded-[32px] bg-slate-50 border border-slate-100 hover:border-primary/20 transition-all group cursor-pointer">
+                     <div className="flex items-center justify-between gap-4">
+                        <h4 className="text-lg font-bold text-[#1a1a1a]">{faq.q}</h4>
+                        <PlusIcon className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
+                     </div>
+                     <p className="mt-4 text-[#666666] leading-relaxed text-[15px] hidden group-hover:block animate-fade-in">{faq.a}</p>
+                  </div>
+               ))}
+            </div>
+         </div>
+      </section>
+
+      {/* Final Call to Action */}
       <section className="py-40 bg-white px-6 relative overflow-hidden">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
          <div className="container mx-auto max-w-4xl text-center relative z-10">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-10 leading-[1.1]">Ready to boost <br />your GP?</h2>
-            <p className="text-xl text-[#6b7280] mb-12 max-w-xl mx-auto">Join thousands of Nigerian students already using SabiBook AI to master their courses.</p>
+            <h2 className="text-6xl md:text-8xl font-black tracking-tighter mb-10 leading-[0.9]">Stop reading. <br /><span className="text-primary italic">Start sabing.</span></h2>
+            <p className="text-xl text-[#6b7280] mb-12 max-w-xl mx-auto font-medium">Join 5,000+ students from UNILAG, LASU, and OAU who are already crushing their grades.</p>
             <Link 
               href="/signup"
-              className="px-16 py-6 bg-[#1a1a1a] text-white text-xl font-bold rounded-3xl shadow-2xl hover:scale-105 active:scale-95 transition-all inline-block"
+              className="px-16 py-7 bg-[#1a1a1a] text-white text-2xl font-black rounded-[32px] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.3)] hover:scale-[1.05] active:scale-95 transition-all inline-flex items-center gap-4 group"
             >
-              Launch App Free
+              Get Started Now
+              <ArrowRight className="w-8 h-8 group-hover:translate-x-2 transition-transform" />
             </Link>
          </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 bg-white border-t border-[#eef1f4] px-6">
-         <div className="container mx-auto max-w-6xl flex flex-col md:flex-row justify-between items-start gap-12">
-            <div className="max-w-xs">
-               <div className="flex items-center gap-2 mb-6">
-                  <div className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center">
-                     <span className="text-white font-bold italic">C</span>
+      <footer className="py-32 bg-white border-t border-[#eef1f4] px-6">
+         <div className="container mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-20 mb-20">
+               <div className="col-span-1 lg:col-span-2">
+                  <Link href="/" className="flex items-center gap-2 mb-8">
+                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                        <span className="text-white font-bold text-xl italic">C</span>
+                     </div>
+                     <span className="text-2xl font-black tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
+                  </Link>
+                  <p className="text-lg text-[#6b7280] leading-relaxed max-w-md mb-8">
+                     The future of Nigerian education is AI-first. We're building tools to help every student reach their full potential.
+                  </p>
+                  <div className="flex gap-4">
+                     <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
+                        <Globe className="w-5 h-5" />
+                     </div>
+                     <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
+                        <MessageSquare className="w-5 h-5" />
+                     </div>
                   </div>
-                  <span className="text-xl font-bold tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
                </div>
-               <p className="text-sm text-[#6b7280] leading-relaxed">Empowering Nigerian university students with AI-first study intelligence.</p>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-20">
+               
                <div>
-                  <h5 className="font-bold mb-6 text-sm">Product</h5>
-                  <ul className="text-sm text-[#666666] space-y-4">
-                     <li><Link href="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link></li>
-                     <li>AI Chat</li>
-                     <li>Privacy</li>
+                  <h5 className="font-black text-sm uppercase tracking-widest mb-10 text-slate-300">Product</h5>
+                  <ul className="space-y-6 text-[15px] font-bold text-[#666666]">
+                     <li><Link href="/dashboard" className="hover:text-primary transition-colors">Student Dashboard</Link></li>
+                     <li><Link href="#features" className="hover:text-primary transition-colors">AI Features</Link></li>
+                     <li><Link href="#pricing" className="hover:text-primary transition-colors">Pricing Plans</Link></li>
                   </ul>
                </div>
+
                <div>
-                  <h5 className="font-bold mb-6 text-sm">Legal</h5>
-                  <ul className="text-sm text-[#666666] space-y-4">
-                     <li>Terms</li>
-                     <li>Academic Policy</li>
+                  <h5 className="font-black text-sm uppercase tracking-widest mb-10 text-slate-300">Legal</h5>
+                  <ul className="space-y-6 text-[15px] font-bold text-[#666666]">
+                     <li><Link href="#" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                     <li><Link href="#" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                     <li><Link href="#" className="hover:text-primary transition-colors">Academic Integrity</Link></li>
                   </ul>
                </div>
             </div>
-         </div>
-         <div className="container mx-auto max-w-6xl mt-20 pt-8 border-t border-slate-50 flex justify-between text-[11px] font-bold text-[#aaaaaa] uppercase tracking-widest">
-            <p>© 2026 SabiBook AI. ALL RIGHTS RESERVED.</p>
-            <p>Made with ❤️ for Nigeria</p>
+            
+            <div className="pt-20 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-10 text-[11px] font-black text-[#aaaaaa] uppercase tracking-[0.3em]">
+               <p>© 2026 SABIBOOK AI. ALL RIGHTS RESERVED.</p>
+               <p className="flex items-center gap-2 italic">Designed with ❤️ for Nigeria's brightest minds</p>
+            </div>
          </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 6s infinite ease-in-out;
+        }
+      `}</style>
     </div>
+  );
+}
+
+function PlusIcon(props: any) {
+  return (
+    <svg {...props} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+    </svg>
   );
 }
