@@ -5,23 +5,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Mail, Lock, ChevronRight, User, GraduationCap, School, Book } from "lucide-react";
 
-const GithubIcon = ({ className }: { className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-    <path d="M9 18c-4.51 2-5-2-7-2" />
-  </svg>
-);
 
 const NIGERIAN_UNIVERSITIES = [
   "University of Lagos (UNILAG)",
@@ -230,28 +213,6 @@ export default function SignupPage() {
                 </button>
               </div>
             </form>
-          )}
-
-          {step === 1 && (
-            <>
-              <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#eef1f4]"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-4 text-slate-400 font-bold tracking-widest">Or sign up with</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-3 py-3 border border-[#eef1f4] rounded-2xl hover:bg-slate-50 transition-all text-sm font-bold text-[#1a1a1a]">
-                  <div className="w-5 h-5 flex items-center justify-center font-black">G</div> Google
-                </button>
-                <button className="flex items-center justify-center gap-3 py-3 border border-[#eef1f4] rounded-2xl hover:bg-slate-50 transition-all text-sm font-bold text-[#1a1a1a]">
-                  <GithubIcon className="w-5 h-5" /> GitHub
-                </button>
-              </div>
-            </>
           )}
         </div>
 
