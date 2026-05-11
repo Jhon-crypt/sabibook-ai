@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<any>(null);
   const [courses, setCourses] = useState<any[]>([]);
   const [stats, setStats] = useState({ courses: 0, pdfs: 0, progress: 0 });
+  const [activity, setActivity] = useState<{ day: string; hrs: number; height: string }[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [question, setQuestion] = useState("");
@@ -81,6 +82,35 @@ export default function DashboardPage() {
         pdfs: pdfCount || 0,
         progress: coursesData?.length ? Math.round(coursesData.reduce((acc, c) => acc + (c.progress || 0), 0) / coursesData.length) : 0
       });
+
+      // 4. Fetch activity data (Study Sessions)
+      const { data: sessionData } = await supabase
+        .from("study_sessions")
+        .select("start_time, total_time_seconds")
+        .eq("user_id", authUser.id)
+        .gte("start_time", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+
+      const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      const activityMap: Record<string, number> = {};
+      days.forEach(d => activityMap[d] = 0);
+
+      sessionData?.forEach(s => {
+        const dayName = days[new Date(s.start_time).getDay()];
+        activityMap[dayName] += (s.total_time_seconds || 0) / 3600; // Convert to hours
+      });
+
+      const formattedActivity = days.map(day => {
+        const hrs = Math.min(10, activityMap[day]); // Cap at 10h for visual
+        return {
+          day,
+          hrs: Math.round(activityMap[day] * 10) / 10,
+          height: `h-[${Math.max(10, Math.round((hrs / 10) * 100))}%]`
+        };
+      });
+
+      // Shift array so it starts from Monday for the UI
+      const mondayStart = [...formattedActivity.slice(1), formattedActivity[0]];
+      setActivity(mondayStart);
 
     } catch (err) {
       console.error("Error fetching dashboard data:", err);
@@ -238,12 +268,6 @@ export default function DashboardPage() {
           </div>
           
           <div className="flex items-center gap-4">
-             <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#eef1f4] rounded-full text-sm font-semibold hover:bg-slate-50 transition-all font-sans">
-                <Video className="w-4 h-4 text-[#FF5A5F]" /> Join Live Session
-             </button>
-             <button className="flex items-center gap-2 px-5 py-2.5 bg-[#FF5A5F] text-white rounded-full text-sm font-semibold hover:bg-red-600 transition-all font-sans shadow-lg shadow-red-200">
-                <Zap className="w-4 h-4" /> Ask AI Tutor
-             </button>
              <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#eef1f4] relative">
                 <Image src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200" alt="Avatar" fill className="object-cover" unoptimized />
              </div>
@@ -290,28 +314,29 @@ export default function DashboardPage() {
               </div>
               
               <div className="flex items-end justify-between h-40 gap-2 px-4">
-                 {[
-                   { day: "Mon", hrs: 4, height: "h-[40%]" },
-                   { day: "Tue", hrs: 6, height: "h-[60%]" },
-                   { day: "Wed", hrs: 8, height: "h-[80%]" },
-                   { day: "Thu", hrs: 5, height: "h-[50%]" },
-                   { day: "Fri", hrs: 9, height: "h-[90%]" },
-                   { day: "Sat", hrs: 3, height: "h-[30%]" },
-                   { day: "Sun", hrs: 7, height: "h-[70%]" },
-                 ].map((d, i) => (
-                   <div key={i} className="flex-1 flex flex-col items-center gap-3 group">
-                      <div className="relative w-full flex items-end justify-center h-32">
-                         <div className={`w-10 ${d.height} bg-slate-50 rounded-xl group-hover:bg-[#FFF0F0] transition-all relative overflow-hidden`}>
-                            <div className={`absolute bottom-0 left-0 w-full bg-[#FF5A5F] rounded-xl transition-all duration-1000 ${d.height} opacity-80 group-hover:opacity-100 shadow-lg shadow-red-100`} />
+                 {activity.length === 0 ? (
+                    <div className="w-full flex items-center justify-center text-slate-300 font-bold uppercase tracking-widest text-[10px]">
+                       No study data for this week yet
+                    </div>
+                 ) : (
+                    activity.map((d, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-3 group">
+                         <div className="relative w-full flex items-end justify-center h-32">
+                            <div className={`w-10 bg-slate-50 rounded-xl group-hover:bg-[#FFF0F0] transition-all relative overflow-hidden h-full`}>
+                               <div 
+                                 className={`absolute bottom-0 left-0 w-full bg-[#FF5A5F] rounded-xl transition-all duration-1000 opacity-80 group-hover:opacity-100 shadow-lg shadow-red-100`}
+                                 style={{ height: d.height.replace('h-[', '').replace(']', '') }}
+                               />
+                            </div>
+                            {/* Tooltip */}
+                            <div className="absolute -top-8 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                               {d.hrs}h
+                            </div>
                          </div>
-                         {/* Tooltip */}
-                         <div className="absolute -top-8 bg-slate-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
-                            {d.hrs}h
-                         </div>
+                         <span className="text-[11px] font-bold text-[#aaaaaa] uppercase tracking-wider">{d.day}</span>
                       </div>
-                      <span className="text-[11px] font-bold text-[#aaaaaa] uppercase tracking-wider">{d.day}</span>
-                   </div>
-                 ))}
+                    ))
+                 )}
               </div>
            </div>
 
