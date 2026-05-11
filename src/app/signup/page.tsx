@@ -306,8 +306,23 @@ export default function SignupPage() {
                   <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button 
-                  onClick={() => window.location.reload()}
-                  className="text-sm font-bold text-primary hover:underline"
+                  onClick={async () => {
+                    try {
+                      setLoading(true);
+                      const { error } = await supabase.auth.resend({
+                        type: 'signup',
+                        email: formData.email,
+                      });
+                      if (error) throw error;
+                      alert("Verification email resent!");
+                    } catch (err: any) {
+                      setError(err.message || "Failed to resend email");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  disabled={loading}
+                  className="text-sm font-bold text-primary hover:underline disabled:opacity-50"
                 >
                   Didn't get the email? Resend
                 </button>
