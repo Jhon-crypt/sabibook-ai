@@ -19,6 +19,8 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import Header from "@/components/Header";
+
 export default function CoursesPage() {
   const router = useRouter();
   const [courses, setCourses] = useState<any[]>([]);
@@ -81,13 +83,11 @@ export default function CoursesPage() {
       <Sidebar />
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-[#eef1f4] flex items-center justify-between px-10">
-          <div>
-            <h2 className="text-[20px] font-bold">My Courses</h2>
-            <p className="text-[12px] text-[#888888]">Manage your academic library and track your progress.</p>
-          </div>
-          
+        <Header 
+          title="My Courses" 
+          description="Manage your academic library and track your progress." 
+          user={user}
+        >
           <div className="flex items-center gap-4">
              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -106,7 +106,7 @@ export default function CoursesPage() {
                 <Plus className="w-4 h-4" /> Create Course
              </button>
           </div>
-        </header>
+        </Header>
 
         <div className="flex-1 overflow-y-auto p-10 space-y-8 animate-slide-up">
            {/* Stats Row */}

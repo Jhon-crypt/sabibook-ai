@@ -30,6 +30,8 @@ import { useRouter } from "next/navigation";
 import CreateCourseModal from "@/components/CreateCourseModal";
 import Sidebar from "@/components/Sidebar";
 
+import Header from "@/components/Header";
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
@@ -217,19 +219,11 @@ export default function DashboardPage() {
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-[#eef1f4] flex items-center justify-between px-10 animate-fade-in">
-          <div>
-            <h2 className="text-[20px] font-bold">Dashboard</h2>
-            <p className="text-[12px] text-[#888888]">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Maxwell'}! Ready to level up?</p>
-          </div>
-          
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-[#eef1f4] relative">
-                <Image src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200" alt="Avatar" fill className="object-cover" unoptimized />
-             </div>
-          </div>
-        </header>
+        <Header 
+          title="Dashboard" 
+          description="Ready to level up?" 
+          user={user}
+        />
 
         {/* Dashboard Grid */}
         <div className="flex-1 overflow-y-auto p-10 space-y-8 animate-slide-up">
