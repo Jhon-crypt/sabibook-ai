@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import CreateCourseModal from "@/components/CreateCourseModal";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -35,6 +36,9 @@ export default function DashboardPage() {
   const [stats, setStats] = useState({ courses: 0, pdfs: 0, progress: 0 });
   const [activity, setActivity] = useState<{ day: string; hrs: number; height: string }[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Create Course Modal State
+  const [showModal, setShowModal] = useState(false);
   
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string }[]>([]);
@@ -198,6 +202,7 @@ export default function DashboardPage() {
     }
   };
 
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push("/");
@@ -229,11 +234,11 @@ export default function DashboardPage() {
           <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Main Tools</p>
           {[
             { label: "Dashboard", active: true, icon: <LayoutDashboard className="w-5 h-5" /> },
-            { label: "Notifications", active: false, icon: <Bell className="w-5 h-5" /> },
             { label: "My Courses", active: false, icon: <BookOpen className="w-5 h-5" /> },
             { label: "AI Assistant", active: false, icon: <Bot className="w-5 h-5" /> },
             { label: "Assignments", active: false, icon: <ClipboardList className="w-5 h-5" /> },
-            { label: "Certificates", active: false, icon: <Award className="w-5 h-5" /> }
+            { label: "Certificates", active: false, icon: <Award className="w-5 h-5" /> },
+            { label: "Notifications", active: false, icon: <Bell className="w-5 h-5" /> },
           ].map((item, i) => (
             <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${item.active ? 'bg-[#FFF0F0] text-[#FF5A5F]' : 'text-[#666666] hover:bg-slate-50'}`}>
               <span className="text-lg">{item.icon}</span>
@@ -363,12 +368,7 @@ export default function DashboardPage() {
                             Create your first course to start uploading your handouts and chatting with our AI.
                          </p>
                          <button 
-                           onClick={() => {
-                             const name = prompt("Enter Course Name (e.g. GST 101):");
-                             if (name) {
-                               supabase.from("courses").insert([{ name, user_id: user.id }]).then(() => fetchData());
-                             }
-                           }}
+                           onClick={() => setShowModal(true)}
                            className="px-10 py-4 bg-[#1a1a1a] text-white font-bold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group"
                          >
                             Create Course Now
@@ -527,6 +527,14 @@ export default function DashboardPage() {
            </div>
         </div>
       </main>
+
+      {/* Create Course Modal Component */}
+      <CreateCourseModal 
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={fetchData}
+        userId={user?.id}
+      />
 
       <style jsx>{`
         .scrollbar-style::-webkit-scrollbar {
