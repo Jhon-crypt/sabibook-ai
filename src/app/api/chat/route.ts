@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const context = pdfData?.map(p => p.content_text).join("\n\n---\n\n") || "No lecture notes uploaded yet.";
 
     const response = await groq.chat.completions.create({
-      model: "llama3-70b-8192",
+      model: "openai/gpt-oss-20b",
       messages: [
         {
           role: "system",
@@ -24,10 +24,6 @@ export async function POST(req: Request) {
 - MISSION: Help students understand their lecture notes through clear, academic, and culturally relevant explanations.
 - CONTEXT: Use the provided lecture notes summary to answer. If the answer isn't there, rely on your knowledge but prioritize the notes.
 - NIGERIAN CONTEXT: Use relatable metaphors and clear Nigerian academic English. 
-- MODES:
-    * SUMMARIES: Provide bold headers, bullet points, and a "TL;DR" at the end.
-    * QUIZZES: Generate high-quality practice questions (Multiple Choice or Theory) based on actual exam patterns in Nigerian universities.
-    * SIMPLE EXPLAIN: (ELIFE/Explain Like I'm Five) Use zero jargon, simple language, and relatable analogies.
 - TONE: Encouraging, professional, and slightly informal ("Sabi" tone).
 
 Context from lecture notes:
@@ -38,14 +34,33 @@ ${context}`,
           content: question,
         },
       ],
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "study_response",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              answer: { type: "string" },
+              foundContext: { type: "boolean" },
+              suggestedQuestions: {
+                type: "array",
+                items: { type: "string" }
+              }
+            },
+            required: ["answer", "foundContext", "suggestedQuestions"],
+            additionalProperties: false
+          }
+        }
+      },
       temperature: 0.7,
       max_tokens: 1024,
     });
 
-    return Response.json({
-      answer: response.choices[0]?.message?.content,
-      foundContext: !!context
-    });
+    const result = JSON.parse(response.choices[0]?.message?.content || "{}");
+
+    return Response.json(result);
   } catch (error: any) {
     console.error("Chat API Error:", error);
     return Response.json({ error: error.message }, { status: 500 });

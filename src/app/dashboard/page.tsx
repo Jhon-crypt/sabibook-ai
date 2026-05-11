@@ -45,7 +45,7 @@ export default function DashboardPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const [question, setQuestion] = useState("");
-  const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string; suggestedQuestions?: string[] }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
   
@@ -195,7 +195,11 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (data.answer) {
-        setMessages(prev => [...prev, { role: "ai", content: data.answer }]);
+        setMessages(prev => [...prev, { 
+          role: "ai", 
+          content: data.answer,
+          suggestedQuestions: data.suggestedQuestions 
+        }]);
       } else {
         setMessages(prev => [...prev, { role: "ai", content: "Error: " + (data.error || "Unknown error") }]);
       }
@@ -416,6 +420,20 @@ export default function DashboardPage() {
                             msg.role === "user" ? "bg-[#FF5A5F] text-white shadow-md shadow-red-100" : "bg-slate-50 border border-slate-100 text-slate-700"
                           }`}>
                             {msg.content}
+                            
+                            {msg.role === "ai" && msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && (
+                              <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
+                                {msg.suggestedQuestions.map((q, idx) => (
+                                  <button
+                                    key={idx}
+                                    onClick={() => setQuestion(q)}
+                                    className="text-[10px] font-bold bg-white px-3 py-1.5 rounded-lg border border-slate-100 hover:border-red-200 hover:text-red-500 transition-all shadow-sm"
+                                  >
+                                    {q}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))
