@@ -248,25 +248,26 @@ export default function DashboardPage() {
            </div>
 
            {/* Activity Chart Section */}
-           <div className="p-8 bg-white border border-[#eef1f4] rounded-[28px] shadow-sm">
-              <div className="flex items-center justify-between mb-8">
-                 <div>
-                    <h3 className="text-[16px] font-bold">Weekly Activity</h3>
-                    <p className="text-[11px] text-[#aaaaaa] mt-1">Study hours per day this week</p>
-                 </div>
-                 <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                       <div className="w-3 h-3 bg-[#FF5A5F] rounded-full" />
-                       <span className="text-[11px] font-bold text-[#666666]">Study Time</span>
-                    </div>
-                    <select className="bg-slate-50 border-none text-[11px] font-bold text-[#666666] rounded-lg px-3 py-1.5 outline-none cursor-pointer">
-                       <option>This Week</option>
-                       <option>Last Week</option>
-                    </select>
-                 </div>
-              </div>
+            <div className="p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] shadow-sm">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                  <div>
+                     <h3 className="text-[16px] font-bold">Weekly Activity</h3>
+                     <p className="text-[11px] text-[#aaaaaa] mt-1">Study hours per day this week</p>
+                  </div>
+                  <div className="flex items-center justify-between sm:justify-end gap-4">
+                     <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-[#FF5A5F] rounded-full" />
+                        <span className="text-[11px] font-bold text-[#666666]">Study Time</span>
+                     </div>
+                     <select className="bg-slate-50 border-none text-[11px] font-bold text-[#666666] rounded-lg px-3 py-1.5 outline-none cursor-pointer">
+                        <option>This Week</option>
+                        <option>Last Week</option>
+                     </select>
+                  </div>
+               </div>
               
-              <div className="flex items-end justify-between h-40 gap-2 px-4">
+              <div className="overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+                 <div className="flex items-end justify-between h-40 gap-3 min-w-[500px] md:min-w-0">
                  {activity.length === 0 ? (
                     <div className="w-full flex items-center justify-center text-slate-300 font-bold uppercase tracking-widest text-[10px]">
                        No study data for this week yet
@@ -292,6 +293,7 @@ export default function DashboardPage() {
                  )}
               </div>
            </div>
+        </div>
 
            {/* Second Row: Courses and AI Assistant */}
            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -327,14 +329,14 @@ export default function DashboardPage() {
                       courses.map((course) => (
                         <div key={course.id} className="group p-5 rounded-2xl border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer">
                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-center gap-4">
+                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
                                     <BookOpen className="w-6 h-6 text-slate-400 group-hover:text-[#FF5A5F]" />
                                  </div>
                                  <div>
-                                    <h4 className="font-bold text-[15px]">{course.name}</h4>
-                                    <p className="text-[11px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
-                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs uploaded • Created {new Date(course.created_at).toLocaleDateString()}
+                                    <h4 className="font-bold text-[15px] line-clamp-1">{course.name}</h4>
+                                    <p className="text-[11px] text-[#aaaaaa] flex flex-wrap items-center gap-1.5 mt-1">
+                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs • {new Date(course.created_at).toLocaleDateString()}
                                     </p>
                                  </div>
                               </div>
