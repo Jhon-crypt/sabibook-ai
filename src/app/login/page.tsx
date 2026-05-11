@@ -3,18 +3,55 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ChevronRight, UserCircle } from "lucide-react";
-
+import { Mail, Lock, ChevronRight, UserCircle, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate successful login
-    router.push("/dashboard");
+    setLoading(true);
+    setError("");
+
+    try {
+      let email = identifier;
+
+      // Check if the identifier is likely a matric number (doesn't contain @)
+      if (!identifier.includes("@")) {
+        // Try to find the email associated with this matric number
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("email")
+          .eq("matric_number", identifier)
+          .maybeSingle(); // maybeSingle() is safer as it won't throw an error if 0 rows found
+
+        if (userError || !userData) {
+          throw new Error("No account found with this matric number. Please sign up first!");
+        }
+        email = userData.email;
+      }
+
+      // Sign in with the resolved email
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (signInError) throw signInError;
+
+      if (data.user) {
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred during sign in");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -32,6 +69,12 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-[#eef1f4]">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl font-semibold">
+              {error}
+            </div>
+          )}
+
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
               <label className="block text-[13px] font-bold text-[#1a1a1a] mb-2 pl-1 uppercase tracking-wider">Email or Matric Number</label>
@@ -72,9 +115,11 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 mt-4"
+              disabled={loading}
+              className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-50"
             >
-              Sign In <ChevronRight className="w-5 h-5" />
+              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Sign In"}
+              {!loading && <ChevronRight className="w-5 h-5" />}
             </button>
           </form>
         </div>

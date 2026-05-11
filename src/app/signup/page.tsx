@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ChevronRight, User, GraduationCap, School, Book } from "lucide-react";
-
+import { Mail, Lock, ChevronRight, User, GraduationCap, School, Book, Loader2 } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 const NIGERIAN_UNIVERSITIES = [
   "University of Lagos (UNILAG)",
@@ -27,6 +27,8 @@ const NIGERIAN_UNIVERSITIES = [
 export default function SignupPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -38,6 +40,7 @@ export default function SignupPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
   };
 
   const handleNext = (e: React.FormEvent) => {
@@ -45,10 +48,36 @@ export default function SignupPage() {
     setStep(2);
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate successful signup
-    router.push("/dashboard");
+    setLoading(true);
+    setError("");
+
+    try {
+      const { data, error: signupError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.name,
+            matric_number: formData.matricNumber,
+            university: formData.university,
+            department: formData.department,
+          }
+        }
+      });
+
+      if (signupError) throw signupError;
+
+      if (data.user) {
+        // Success - redirect to dashboard
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred during signup");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -70,6 +99,12 @@ export default function SignupPage() {
         </div>
 
         <div className="bg-white p-8 rounded-[32px] shadow-xl shadow-slate-200/50 border border-[#eef1f4]">
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 text-sm rounded-2xl font-semibold">
+              {error}
+            </div>
+          )}
+
           {step === 1 ? (
             <form className="space-y-5" onSubmit={handleNext}>
               <div>
@@ -122,6 +157,7 @@ export default function SignupPage() {
                     placeholder="••••••••"
                     className="w-full bg-[#f8f9fa] border border-[#eef1f4] rounded-2xl py-4 pl-12 pr-4 text-sm focus:outline-none focus:border-primary/30 transition-all font-medium placeholder:text-slate-400"
                     required
+                    minLength={6}
                   />
                 </div>
               </div>
@@ -201,15 +237,18 @@ export default function SignupPage() {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 py-4 bg-slate-50 text-[#1a1a1a] border border-[#eef1f4] font-bold rounded-2xl hover:bg-slate-100 transition-all active:scale-95"
+                  disabled={loading}
+                  className="flex-1 py-4 bg-slate-50 text-[#1a1a1a] border border-[#eef1f4] font-bold rounded-2xl hover:bg-slate-100 transition-all active:scale-95 disabled:opacity-50"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
-                  className="flex-[2] py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+                  disabled={loading}
+                  className="flex-[2] py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  Create Account <ChevronRight className="w-5 h-5" />
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
+                  {!loading && <ChevronRight className="w-5 h-5" />}
                 </button>
               </div>
             </form>
