@@ -351,8 +351,29 @@ export default function DashboardPage() {
                  
                  <div className="space-y-6">
                     {courses.length === 0 ? (
-                      <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-[32px] text-slate-400">
-                         <p className="text-sm font-bold">No courses yet. Upload a PDF to get started!</p>
+                      <div className="py-20 flex flex-col items-center justify-center text-center px-6">
+                         <div className="w-24 h-24 bg-[#FFF0F0] rounded-[32px] flex items-center justify-center mb-8 shadow-lg shadow-red-50 relative animate-bounce-slow">
+                            <BookOpen className="w-10 h-10 text-primary" />
+                            <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-primary rounded-full border-4 border-white flex items-center justify-center">
+                               <Plus className="w-4 h-4 text-white" />
+                            </div>
+                         </div>
+                         <h3 className="text-2xl font-black text-[#1a1a1a] mb-3">No courses yet!</h3>
+                         <p className="text-slate-400 text-sm max-w-[280px] leading-relaxed mb-10">
+                            Create your first course to start uploading your handouts and chatting with our AI.
+                         </p>
+                         <button 
+                           onClick={() => {
+                             const name = prompt("Enter Course Name (e.g. GST 101):");
+                             if (name) {
+                               supabase.from("courses").insert([{ name, user_id: user.id }]).then(() => fetchData());
+                             }
+                           }}
+                           className="px-10 py-4 bg-[#1a1a1a] text-white font-bold rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition-all flex items-center gap-3 group"
+                         >
+                            Create Course Now
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                         </button>
                       </div>
                     ) : (
                       courses.map((course) => (
