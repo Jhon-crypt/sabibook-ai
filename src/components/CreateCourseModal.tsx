@@ -23,6 +23,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
   const [courseTitle, setCourseTitle] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [creating, setCreating] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   if (!isOpen) return null;
 
@@ -31,6 +32,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
     if (!courseCode || !courseTitle || !userId) return;
 
     setCreating(true);
+    setUploadProgress(0);
     try {
       // 1. Create Course
       const { data: newCourse, error: courseError } = await supabase
@@ -46,30 +48,46 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
 
       // 2. Upload PDF if selected
       if (selectedFile && newCourse) {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-        formData.append("userId", userId);
-        formData.append("courseId", newCourse.id);
+        await new Promise((resolve, reject) => {
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+          formData.append("userId", userId);
+          formData.append("courseId", newCourse.id);
 
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/api/upload", true);
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              setUploadProgress(percent);
+            }
+          };
+
+          xhr.onload = () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve(JSON.parse(xhr.responseText));
+            } else {
+              reject(new Error("Upload failed"));
+            }
+          };
+
+          xhr.onerror = () => reject(new Error("Network error"));
+          xhr.send(formData);
         });
-        const uploadData = await res.json();
-        if (!uploadData.success) {
-          console.error("PDF Upload failed:", uploadData.error);
-        }
       }
 
       setCourseCode("");
       setCourseTitle("");
       setSelectedFile(null);
+      setUploadProgress(0);
       onSuccess();
       onClose();
     } catch (err: any) {
       alert("Error: " + err.message);
     } finally {
       setCreating(false);
+      setUploadProgress(0);
     }
   };
 
@@ -121,7 +139,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
                    <label className="block text-[11px] font-black text-[#aaaaaa] uppercase tracking-widest mb-2 pl-1">Upload First PDF (Optional)</label>
                    <div 
                      onClick={() => !creating && document.getElementById('modal-pdf-comp')?.click()}
-                     className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                     className={`border-2 border-dashed rounded-3xl p-8 flex flex-col items-center justify-center cursor-pointer transition-all relative overflow-hidden ${
                         selectedFile ? 'border-green-500 bg-green-50/30' : 'border-slate-100 bg-slate-50 hover:bg-slate-100'
                      }`}
                    >
@@ -135,7 +153,25 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
                       {selectedFile ? (
                          <>
                            <CheckCircle2 className="w-8 h-8 text-green-500 mb-2" />
-                           <span className="text-xs font-bold text-green-600 truncate max-w-xs">{selectedFile.name}</span>
+                           <span className="text-xs font-bold text-green-600 truncate max-w-[80%]">{selectedFile.name}</span>
+                           
+                           {/* Progress Overlay */}
+                           {creating && uploadProgress > 0 && uploadProgress < 100 && (
+                             <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 animate-fade-in">
+                               <div className="w-full max-w-[200px]">
+                                 <div className="flex justify-between items-end mb-2">
+                                   <span className="text-[10px] font-black text-primary uppercase">Uploading...</span>
+                                   <span className="text-[10px] font-black text-primary">{uploadProgress}%</span>
+                                 </div>
+                                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                   <div 
+                                     className="h-full bg-primary transition-all duration-300" 
+                                     style={{ width: `${uploadProgress}%` }}
+                                   />
+                                 </div>
+                               </div>
+                             </div>
+                           )}
                          </>
                       ) : (
                          <>
@@ -151,8 +187,19 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
                   disabled={creating}
                   className="w-full py-5 bg-[#1a1a1a] text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                   {creating ? <Loader2 className="w-6 h-6 animate-spin" /> : "Create Course"}
-                   {!creating && <ChevronRight className="w-5 h-5" />}
+                   {creating ? (
+                     <>
+                       <Loader2 className="w-6 h-6 animate-spin" />
+                       <span className="text-sm">
+                         {uploadProgress > 0 ? `Uploading PDF (${uploadProgress}%)` : "Initializing..."}
+                       </span>
+                     </>
+                   ) : (
+                     <>
+                       <span>Create Course</span>
+                       <ChevronRight className="w-5 h-5" />
+                     </>
+                   )}
                 </button>
              </form>
           </div>
