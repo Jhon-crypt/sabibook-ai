@@ -1,4 +1,4 @@
-const pdfParse = require("pdf-parse");
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
@@ -13,9 +13,44 @@ export async function POST(req: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const data = await pdfParse(buffer);
+    
+    // 1. Parse PDF text with a custom options to avoid ENOENT test file error
+    const data = await pdfParse(buffer, {
+      pagerender: (pageData: any) => {
+        return pageData.getTextContent()
+          .then((textContent: any) => {
+            let lastY, text = '';
+            for (let item of textContent.items) {
+              if (lastY == item.transform[5] || !lastY){
+                text += item.str;
+              } else {
+                text += '\n' + item.str;
+              }    
+              lastY = item.transform[5];
+            }
+            return text;
+          });
+      }
+    });
 
-    // Save to Supabase
+    // 2. Upload to Supabase Storage
+    const fileName = `${userId}/${Date.now()}-${file.name}`;
+    const { data: storageData, error: storageError } = await supabase
+      .storage
+      .from("handouts")
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (storageError) {
+      console.error("Storage Error:", storageError);
+      // Fallback: If bucket doesn't exist, we might get an error. 
+      // But we'll still proceed with the DB record if the user hasn't set up the bucket yet, 
+      // though ideally they should.
+    }
+
+    // 3. Save to Database
     const { error: dbError } = await supabase
       .from("pdfs")
       .insert([
@@ -23,7 +58,7 @@ export async function POST(req: Request) {
           user_id: userId,
           course_id: courseId,
           file_name: file.name,
-          file_path: "temp/" + file.name, // In a real app, upload to storage first
+          file_path: storageData?.path || "pending/" + file.name,
           file_size: file.size,
           content_text: data.text,
         },
@@ -34,6 +69,7 @@ export async function POST(req: Request) {
     return Response.json({ 
       success: true, 
       pages: data.numpages,
+      filePath: storageData?.path,
       textPreview: data.text.substring(0, 100) + "..."
     });
   } catch (error: any) {

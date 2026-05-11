@@ -11,10 +11,12 @@ import {
   Loader2,
   BarChart3,
   TrendingUp,
-  Clock
+  Clock,
+  Trash2
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import CreateCourseModal from "@/components/CreateCourseModal";
+import DeleteCourseModal from "@/components/DeleteCourseModal";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -26,6 +28,9 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<any>(null);
+  const [isDeletingCourse, setIsDeletingCourse] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -58,6 +63,35 @@ export default function CoursesPage() {
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  const handleDeleteCourse = (course: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCourseToDelete(course);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!courseToDelete) return;
+
+    setIsDeletingCourse(true);
+    try {
+      const { error } = await supabase
+        .from("courses")
+        .delete()
+        .eq("id", courseToDelete.id);
+
+      if (error) throw error;
+      
+      setCourses(prev => prev.filter(c => c.id !== courseToDelete.id));
+      setShowDeleteModal(false);
+      setCourseToDelete(null);
+    } catch (err: any) {
+      alert("Error deleting course: " + err.message);
+    } finally {
+      setIsDeletingCourse(false);
     }
   };
 
@@ -150,9 +184,13 @@ export default function CoursesPage() {
                         <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                            <BookOpen className="w-7 h-7 text-slate-400 group-hover:text-primary transition-colors" />
                         </div>
-                        <button className="p-2 hover:bg-slate-50 rounded-xl transition-colors text-slate-400">
-                           <MoreVertical className="w-5 h-5" />
-                        </button>
+                        <button 
+                           onClick={(e) => handleDeleteCourse(course, e)}
+                           className="p-2 hover:bg-red-50 rounded-xl transition-colors text-slate-300 hover:text-red-500 group/delete"
+                           title="Delete Course"
+                         >
+                            <Trash2 className="w-5 h-5 transition-transform group-hover/delete:scale-110" />
+                         </button>
                      </div>
 
                      <div className="mb-8 relative">
@@ -192,6 +230,14 @@ export default function CoursesPage() {
         onClose={() => setShowModal(false)}
         onSuccess={fetchData}
         userId={user?.id}
+      />
+
+      <DeleteCourseModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        courseName={courseToDelete?.name || ""}
+        isDeleting={isDeletingCourse}
       />
     </div>
   );

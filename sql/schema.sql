@@ -188,3 +188,30 @@ INSERT INTO public.users (id, full_name, email, password_hash)
 SELECT id, COALESCE(raw_user_meta_data->>'full_name', 'Student'), email, 'managed_by_auth'
 FROM auth.users 
 ON CONFLICT (id) DO NOTHING;
+
+-- ==========================================
+-- STORAGE BUCKET SETUP
+-- ==========================================
+-- 1. Create the handouts bucket
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('handouts', 'handouts', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- 2. Storage Policies (Allow students to manage their own files)
+-- Allow public access to read handouts (optional, for simple viewing)
+DROP POLICY IF EXISTS "Public Access" ON storage.objects;
+CREATE POLICY "Public Access" ON storage.objects FOR SELECT USING (bucket_id = 'handouts');
+
+-- Allow students to upload their own handouts to their own folder
+DROP POLICY IF EXISTS "Students can upload handouts" ON storage.objects;
+CREATE POLICY "Students can upload handouts" ON storage.objects FOR INSERT WITH CHECK (
+  bucket_id = 'handouts' AND 
+  (auth.uid())::text = (storage.foldername(name))[1]
+);
+
+-- Allow students to delete their own handouts
+DROP POLICY IF EXISTS "Students can delete own handouts" ON storage.objects;
+CREATE POLICY "Students can delete own handouts" ON storage.objects FOR DELETE USING (
+  bucket_id = 'handouts' AND 
+  (auth.uid())::text = (storage.foldername(name))[1]
+);
