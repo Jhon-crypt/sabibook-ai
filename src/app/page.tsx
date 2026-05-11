@@ -32,18 +32,26 @@ export default function LandingPage() {
     const handleAuthRedirect = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
-      // If there's a hash with access_token or we have a session suddenly
-      if (window.location.hash.includes("access_token") || session) {
+      // If there's a hash with access_token, this is a fresh verification
+      if (window.location.hash.includes("access_token")) {
         router.push("/verified");
+      } 
+      // Otherwise, if they are just logged in normally, go to dashboard
+      else if (session) {
+        router.push("/dashboard");
       }
     };
 
     handleAuthRedirect();
 
-    // Also listen for auth state changes (e.g. when the hash is parsed)
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" || event === "USER_UPDATED") {
-        router.push("/verified");
+        if (window.location.hash.includes("access_token")) {
+          router.push("/verified");
+        } else {
+          router.push("/dashboard");
+        }
       }
     });
 

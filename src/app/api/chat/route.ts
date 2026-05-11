@@ -1,12 +1,18 @@
 import { groq } from "@/lib/groq";
-import { searchDocuments } from "@/lib/vectorStore";
+import { supabase } from "@/lib/supabase";
 
 export async function POST(req: Request) {
   try {
     const { question } = await req.json();
     
-    // Get relevant context from our "vector store"
-    const context = searchDocuments(question);
+    // Get the latest PDF contents from the database as context
+    const { data: pdfData } = await supabase
+      .from("pdfs")
+      .select("content_text")
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const context = pdfData?.map(p => p.content_text).join("\n\n---\n\n") || "No lecture notes uploaded yet.";
 
     const response = await groq.chat.completions.create({
       model: "llama3-70b-8192",

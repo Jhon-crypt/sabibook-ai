@@ -21,26 +21,73 @@ import {
   CheckCircle2,
   HelpCircle,
   MoreVertical,
-  BarChart3
+  BarChart3,
+  LogOut,
+  Loader2
 } from "lucide-react";
-
-const INITIAL_COURSES = [
-  { id: 1, name: "GST 101: Use of English", pdfs: 12, progress: 75, lastStudied: "2 hours ago" },
-  { id: 2, name: "MTH 101: Calculus", pdfs: 8, progress: 40, lastStudied: "Yesterday" },
-  { id: 3, name: "CHM 101: General Chemistry", pdfs: 15, progress: 90, lastStudied: "3 days ago" },
-  { id: 4, name: "PHY 101: Mechanics", pdfs: 5, progress: 20, lastStudied: "Just now" },
-];
+import { supabase } from "@/lib/supabase";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [stats, setStats] = useState({ courses: 0, pdfs: 0, progress: 0 });
+  const [loading, setLoading] = useState(true);
+  
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string }[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isAsking, setIsAsking] = useState(false);
-  const [uploadedFiles, setUploadedFiles] = useState<string[]>([]);
-  const [courses, setCourses] = useState(INITIAL_COURSES);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // 1. Get current user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        router.push("/login");
+        return;
+      }
+      setUser(authUser);
+
+      // 2. Fetch courses
+      const { data: coursesData, error: coursesError } = await supabase
+        .from("courses")
+        .select(`
+          *,
+          pdfs (id)
+        `)
+        .eq("user_id", authUser.id);
+
+      if (coursesError) throw coursesError;
+
+      // 3. Fetch stats
+      const { count: pdfCount } = await supabase
+        .from("pdfs")
+        .select('*', { count: 'exact', head: true })
+        .eq("user_id", authUser.id);
+
+      setCourses(coursesData || []);
+      setStats({
+        courses: coursesData?.length || 0,
+        pdfs: pdfCount || 0,
+        progress: coursesData?.length ? Math.round(coursesData.reduce((acc, c) => acc + (c.progress || 0), 0) / coursesData.length) : 0
+      });
+
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -52,11 +99,26 @@ export default function DashboardPage() {
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
 
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("userId", user.id);
+    
+    // For now, if no course exists, we might need to handle it or select a default one
+    // Let's assume they upload to a "General" course if none is selected
+    let courseId = courses[0]?.id;
+    if (!courseId) {
+      // Create a default course if none exists
+      const { data: newCourse } = await supabase
+        .from("courses")
+        .insert([{ name: "General Notes", user_id: user.id }])
+        .select()
+        .single();
+      courseId = newCourse?.id;
+    }
+    formData.append("courseId", courseId);
 
     try {
       const res = await fetch("/api/upload", {
@@ -65,8 +127,8 @@ export default function DashboardPage() {
       });
       const data = await res.json();
       if (data.success) {
-        setUploadedFiles(prev => [...prev, file.name]);
         setMessages(prev => [...prev, { role: "ai", content: `Successfully processed ${file.name}. What would you like to know?` }]);
+        fetchData(); // Refresh stats
       } else {
         alert("Upload failed: " + data.error);
       }
@@ -106,6 +168,22 @@ export default function DashboardPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-[#f8f9fa]">
+        <div className="flex flex-col items-center gap-4">
+           <Loader2 className="w-10 h-10 text-primary animate-spin" />
+           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading your sabi-space...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen bg-[#f8f9fa] overflow-hidden font-sans">
       {/* Sidebar */}
@@ -140,6 +218,13 @@ export default function DashboardPage() {
               <Settings className="w-5 h-5" />
               <span className="text-[14px] font-semibold">Settings</span>
            </div>
+           <div 
+             onClick={handleLogout}
+             className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 cursor-pointer transition-all mt-auto"
+           >
+              <LogOut className="w-5 h-5" />
+              <span className="text-[14px] font-semibold">Logout</span>
+           </div>
         </div>
       </aside>
 
@@ -149,7 +234,7 @@ export default function DashboardPage() {
         <header className="h-20 bg-white border-b border-[#eef1f4] flex items-center justify-between px-10 animate-fade-in">
           <div>
             <h2 className="text-[20px] font-bold">Dashboard</h2>
-            <p className="text-[12px] text-[#888888]">Welcome back, Maxwell! Ready to level up?</p>
+            <p className="text-[12px] text-[#888888]">Welcome back, {user?.user_metadata?.full_name?.split(' ')[0] || 'Maxwell'}! Ready to level up?</p>
           </div>
           
           <div className="flex items-center gap-4">
@@ -170,9 +255,9 @@ export default function DashboardPage() {
            {/* Top Stats Cards */}
            <div className="grid grid-cols-3 gap-6">
               {[
-                { label: "Courses Created", value: courses.length.toString(), desc: "Keep expanding your knowledge!", icon: <BookOpen className="w-4 h-4" /> },
-                { label: "PDFs Uploaded", value: "40", desc: "Total study materials processed", icon: <FileText className="w-4 h-4" /> },
-                { label: "Overall Progress", value: "64%", desc: "Average across all courses", icon: <BarChart3 className="w-4 h-4" /> }
+                { label: "Courses Created", value: stats.courses.toString(), desc: "Keep expanding your knowledge!", icon: <BookOpen className="w-4 h-4" /> },
+                { label: "PDFs Uploaded", value: stats.pdfs.toString(), desc: "Total study materials processed", icon: <FileText className="w-4 h-4" /> },
+                { label: "Overall Progress", value: `${stats.progress}%`, desc: "Average across all courses", icon: <BarChart3 className="w-4 h-4" /> }
               ].map((stat, i) => (
                 <div key={i} className="p-8 bg-white border border-[#eef1f4] rounded-[28px] shadow-sm flex flex-col">
                    <div className="flex items-center gap-3 mb-6">
@@ -240,39 +325,45 @@ export default function DashboardPage() {
                  </div>
                  
                  <div className="space-y-6">
-                    {courses.map((course) => (
-                      <div key={course.id} className="group p-5 rounded-2xl border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer">
-                         <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                               <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
-                                  <BookOpen className="w-6 h-6 text-slate-400 group-hover:text-[#FF5A5F]" />
-                               </div>
-                               <div>
-                                  <h4 className="font-bold text-[15px]">{course.name}</h4>
-                                  <p className="text-[11px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
-                                     <FileText className="w-3 h-3" /> {course.pdfs} PDFs uploaded • Last studied {course.lastStudied}
-                                  </p>
-                               </div>
-                            </div>
-                            <button className="p-2 hover:bg-white rounded-lg transition-colors">
-                               <MoreVertical className="w-4 h-4 text-[#aaaaaa]" />
-                            </button>
-                         </div>
-                         
-                         <div>
-                            <div className="flex justify-between items-end mb-2">
-                               <span className="text-[11px] font-bold text-[#888888]">Progress</span>
-                               <span className="text-[11px] font-black text-[#FF5A5F]">{course.progress}%</span>
-                            </div>
-                            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
-                               <div 
-                                 className="h-full bg-[#FF5A5F] rounded-full transition-all duration-1000" 
-                                 style={{ width: `${course.progress}%` }} 
-                               />
-                            </div>
-                         </div>
+                    {courses.length === 0 ? (
+                      <div className="p-10 text-center border-2 border-dashed border-slate-100 rounded-[32px] text-slate-400">
+                         <p className="text-sm font-bold">No courses yet. Upload a PDF to get started!</p>
                       </div>
-                    ))}
+                    ) : (
+                      courses.map((course) => (
+                        <div key={course.id} className="group p-5 rounded-2xl border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer">
+                           <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-4">
+                                 <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
+                                    <BookOpen className="w-6 h-6 text-slate-400 group-hover:text-[#FF5A5F]" />
+                                 </div>
+                                 <div>
+                                    <h4 className="font-bold text-[15px]">{course.name}</h4>
+                                    <p className="text-[11px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
+                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs uploaded • Created {new Date(course.created_at).toLocaleDateString()}
+                                    </p>
+                                 </div>
+                              </div>
+                              <button className="p-2 hover:bg-white rounded-lg transition-colors">
+                                 <MoreVertical className="w-4 h-4 text-[#aaaaaa]" />
+                              </button>
+                           </div>
+                           
+                           <div>
+                              <div className="flex justify-between items-end mb-2">
+                                 <span className="text-[11px] font-bold text-[#888888]">Progress</span>
+                                 <span className="text-[11px] font-black text-[#FF5A5F]">{course.progress || 0}%</span>
+                              </div>
+                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                                 <div 
+                                   className="h-full bg-[#FF5A5F] rounded-full transition-all duration-1000" 
+                                   style={{ width: `${course.progress || 0}%` }} 
+                                 />
+                              </div>
+                           </div>
+                        </div>
+                      ))
+                    )}
                  </div>
               </div>
 
@@ -362,31 +453,9 @@ export default function DashboardPage() {
               {/* Recently Studied Results Table */}
               <div className="col-span-2 p-8 bg-white border border-[#eef1f4] rounded-[28px]">
                  <h3 className="text-[14px] font-bold mb-6">Study History</h3>
-                 <div className="overflow-hidden">
-                    <table className="w-full text-left">
-                       <thead>
-                          <tr className="text-[11px] font-bold text-[#aaaaaa] uppercase tracking-widest border-b border-slate-50">
-                             <th className="pb-4 pl-2">Course Name</th>
-                             <th className="pb-4">Start Time</th>
-                             <th className="pb-4">End Time</th>
-                             <th className="pb-4">Total Time</th>
-                          </tr>
-                       </thead>
-                       <tbody className="text-[13px] font-semibold text-[#666666]">
-                          {[
-                            { name: "Machine Learning Basics", start: "09:30 AM", end: "10:45 AM", total: "01:38:55" },
-                            { name: "Deep Learning Fundamentals", start: "07:00 PM", end: "07:45 PM", total: "00:45:00" },
-                            { name: "Natural Language Processing", start: "01:40 PM", end: "02:10 PM", total: "00:30:00" }
-                          ].map((course, i) => (
-                            <tr key={i} className="hover:bg-slate-50 transition-all rounded-xl border-b border-slate-50 last:border-0">
-                               <td className="py-4 pl-2">{course.name}</td>
-                               <td className="py-4">{course.start}</td>
-                               <td className="py-4">{course.end}</td>
-                               <td className="py-4 text-[#FF5A5F]">{course.total}</td>
-                            </tr>
-                          ))}
-                       </tbody>
-                    </table>
+                 <div className="overflow-hidden text-center py-10 opacity-40">
+                    <Clock className="w-10 h-10 mx-auto mb-4" />
+                    <p className="text-xs font-bold uppercase tracking-widest">No recent sessions recorded</p>
                  </div>
               </div>
 
