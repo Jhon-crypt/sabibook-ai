@@ -28,6 +28,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import CreateCourseModal from "@/components/CreateCourseModal";
+import Sidebar from "@/components/Sidebar";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -202,66 +203,17 @@ export default function DashboardPage() {
     }
   };
 
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
-  };
-
   if (loading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-[#f8f9fa]">
-        <div className="flex flex-col items-center gap-4">
-           <Loader2 className="w-10 h-10 text-primary animate-spin" />
-           <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading your sabi-space...</p>
-        </div>
+        <Loader2 className="w-10 h-10 text-primary animate-spin" />
       </div>
     );
   }
 
   return (
     <div className="flex h-screen bg-[#f8f9fa] overflow-hidden font-sans">
-      {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-[#eef1f4] flex flex-col p-6 space-y-8 animate-fade-in">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 bg-[#FF5A5F] rounded-xl flex items-center justify-center shadow-lg shadow-red-100">
-            <span className="text-white font-bold text-xl font-serif italic">C</span>
-          </div>
-          <span className="text-xl font-bold tracking-tight">SabiBook<span className="text-[#FF5A5F]">AI</span></span>
-        </Link>
-
-        <nav className="flex-1 flex flex-col gap-2">
-          <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Main Tools</p>
-          {[
-            { label: "Dashboard", active: true, icon: <LayoutDashboard className="w-5 h-5" /> },
-            { label: "My Courses", active: false, icon: <BookOpen className="w-5 h-5" /> },
-            { label: "AI Assistant", active: false, icon: <Bot className="w-5 h-5" /> },
-            { label: "Assignments", active: false, icon: <ClipboardList className="w-5 h-5" /> },
-            { label: "Certificates", active: false, icon: <Award className="w-5 h-5" /> },
-            { label: "Notifications", active: false, icon: <Bell className="w-5 h-5" /> },
-          ].map((item, i) => (
-            <div key={i} className={`flex items-center gap-3 px-4 py-3 rounded-xl cursor-pointer transition-all ${item.active ? 'bg-[#FFF0F0] text-[#FF5A5F]' : 'text-[#666666] hover:bg-slate-50'}`}>
-              <span className="text-lg">{item.icon}</span>
-              <span className="text-[14px] font-semibold">{item.label}</span>
-            </div>
-          ))}
-        </nav>
-
-        <div className="flex flex-col gap-2">
-           <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Settings</p>
-           <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#666666] hover:bg-slate-50 cursor-pointer">
-              <Settings className="w-5 h-5" />
-              <span className="text-[14px] font-semibold">Settings</span>
-           </div>
-           <div 
-             onClick={handleLogout}
-             className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 cursor-pointer transition-all mt-auto"
-           >
-              <LogOut className="w-5 h-5" />
-              <span className="text-[14px] font-semibold">Logout</span>
-           </div>
-        </div>
-      </aside>
+      <Sidebar />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
