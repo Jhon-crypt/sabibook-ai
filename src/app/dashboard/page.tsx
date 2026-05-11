@@ -42,6 +42,7 @@ export default function DashboardPage() {
 
   // Create Course Modal State
   const [showModal, setShowModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<{ role: "user" | "ai"; content: string }[]>([]);
@@ -215,7 +216,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen bg-[#f8f9fa] overflow-hidden font-sans">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -223,12 +224,13 @@ export default function DashboardPage() {
           title="Dashboard" 
           description="Ready to level up?" 
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         />
 
         {/* Dashboard Grid */}
-        <div className="flex-1 overflow-y-auto p-10 space-y-8 animate-slide-up">
-           {/* Top Stats Cards */}
-           <div className="grid grid-cols-3 gap-6">
+        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 animate-slide-up">
+           {/* Stats Row */}
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {[
                 { label: "Courses Created", value: stats.courses.toString(), desc: "Keep expanding your knowledge!", icon: <BookOpen className="w-4 h-4" /> },
                 { label: "PDFs Uploaded", value: stats.pdfs.toString(), desc: "Total study materials processed", icon: <FileText className="w-4 h-4" /> },
@@ -292,9 +294,9 @@ export default function DashboardPage() {
            </div>
 
            {/* Second Row: Courses and AI Assistant */}
-           <div className="grid grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               {/* My Courses List */}
-              <div className="col-span-2 p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col">
+              <div className="xl:col-span-2 p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col">
                  <div className="flex items-center justify-between mb-8">
                     <h3 className="text-[16px] font-bold">My Courses</h3>
                     <button className="text-[12px] font-bold text-[#FF5A5F] hover:underline">View All</button>
@@ -360,7 +362,7 @@ export default function DashboardPage() {
               </div>
 
               {/* AI Study Assistant Feature Box */}
-              <div className="p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col h-full min-h-[500px]">
+              <div className="p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col h-full min-h-[500px]">
                  <div className="flex items-center justify-between mb-4">
                     <span className="text-[14px] font-bold">AI Assistant</span>
                     <div className="flex items-center gap-2">
@@ -441,9 +443,9 @@ export default function DashboardPage() {
            </div>
 
            {/* Results and Schedule Section */}
-           <div className="grid grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
               {/* Recently Studied Results Table */}
-              <div className="col-span-2 p-8 bg-white border border-[#eef1f4] rounded-[28px]">
+              <div className="xl:col-span-2 p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px]">
                  <h3 className="text-[14px] font-bold mb-6">Study History</h3>
                  <div className="overflow-hidden text-center py-10 opacity-40">
                     <Clock className="w-10 h-10 mx-auto mb-4" />

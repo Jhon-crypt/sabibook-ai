@@ -26,6 +26,7 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -80,13 +81,14 @@ export default function CoursesPage() {
 
   return (
     <div className="flex h-screen bg-[#f8f9fa] overflow-hidden font-sans">
-      <Sidebar />
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
       <main className="flex-1 flex flex-col overflow-hidden">
         <Header 
           title="My Courses" 
           description="Manage your academic library and track your progress." 
           user={user}
+          onMenuClick={() => setIsSidebarOpen(true)}
         >
           <div className="flex items-center gap-4">
              <div className="relative">
@@ -108,9 +110,9 @@ export default function CoursesPage() {
           </div>
         </Header>
 
-        <div className="flex-1 overflow-y-auto p-10 space-y-8 animate-slide-up">
+        <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-8 animate-slide-up">
            {/* Stats Row */}
-           <div className="grid grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {[
                 { label: "Total Courses", value: stats.total, icon: <BookOpen className="text-blue-500" />, bg: "bg-blue-50" },
                 { label: "Completed", value: stats.completed, icon: <TrendingUp className="text-green-500" />, bg: "bg-green-50" },
@@ -129,7 +131,7 @@ export default function CoursesPage() {
            </div>
 
            {/* Courses Grid */}
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pb-10">
               {filteredCourses.length === 0 ? (
                 <div className="col-span-full py-20 bg-white border border-[#eef1f4] rounded-[40px] flex flex-col items-center justify-center text-center">
                    <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-300">
