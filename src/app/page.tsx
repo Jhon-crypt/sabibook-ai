@@ -2,6 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 import { 
   BookOpen, 
   Bot, 
@@ -22,6 +25,31 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if we just landed here from a verification link (Supabase adds hash params)
+    const handleAuthRedirect = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      // If there's a hash with access_token or we have a session suddenly
+      if (window.location.hash.includes("access_token") || session) {
+        router.push("/verified");
+      }
+    };
+
+    handleAuthRedirect();
+
+    // Also listen for auth state changes (e.g. when the hash is parsed)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" || event === "USER_UPDATED") {
+        router.push("/verified");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
   return (
     <div className="min-h-screen bg-[#f8f9fa] text-[#1a1a1a] font-sans selection:bg-red-100 animate-fade-in overflow-x-hidden">
       {/* Navigation */}
