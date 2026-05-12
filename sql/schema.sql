@@ -104,12 +104,15 @@ ALTER TABLE schedules ENABLE ROW LEVEL SECURITY;
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, full_name, email, password_hash)
+  INSERT INTO public.users (id, full_name, email, password_hash, matric_number, university, department)
   VALUES (
     new.id, 
     COALESCE(new.raw_user_meta_data->>'full_name', 'Student'), 
     new.email,
-    'managed_by_supabase_auth' -- Password is handled by Supabase Auth
+    'managed_by_supabase_auth', -- Password is handled by Supabase Auth
+    new.raw_user_meta_data->>'matric_number',
+    new.raw_user_meta_data->>'university',
+    new.raw_user_meta_data->>'department'
   )
   ON CONFLICT (id) DO NOTHING;
   RETURN new;
@@ -209,10 +212,20 @@ CREATE POLICY "Users can delete own schedules" ON schedules FOR DELETE USING (au
 -- Run this in your Supabase SQL Editor to fix 
 -- the "RLS Policy Violation" for your current user:
 
-INSERT INTO public.users (id, full_name, email, password_hash)
-SELECT id, COALESCE(raw_user_meta_data->>'full_name', 'Student'), email, 'managed_by_auth'
+INSERT INTO public.users (id, full_name, email, password_hash, matric_number, university, department)
+SELECT 
+  id, 
+  COALESCE(raw_user_meta_data->>'full_name', 'Student'), 
+  email, 
+  'managed_by_auth',
+  raw_user_meta_data->>'matric_number',
+  raw_user_meta_data->>'university',
+  raw_user_meta_data->>'department'
 FROM auth.users 
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  matric_number = EXCLUDED.matric_number,
+  university = EXCLUDED.university,
+  department = EXCLUDED.department;
 
 -- Course Modules (AI-generated curriculum steps)
 CREATE TABLE IF NOT EXISTS course_modules (
