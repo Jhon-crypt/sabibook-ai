@@ -54,9 +54,6 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .single();
       
       setCourse(courseData);
-      if (courseData && typeof courseData.last_module_index === 'number') {
-        setActiveModuleIndex(courseData.last_module_index);
-      }
 
       // Fetch modules
       const { data: modulesData } = await supabase
@@ -66,6 +63,10 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .order("order_index", { ascending: true });
 
       setModules(modulesData || []);
+
+      if (courseData && typeof courseData.last_module_index === 'number') {
+        setActiveModuleIndex(courseData.last_module_index);
+      }
     } catch (err) {
       console.error("Error fetching course board:", err);
     } finally {
@@ -168,7 +169,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .update({ progress })
         .eq("id", courseId);
 
-      setCourse(prev => ({ ...prev, progress }));
+      setCourse((prev: any) => ({ ...prev, progress }));
       setQuizSubmitted(true);
       setShowScoreModal(true);
     } catch (err) {
@@ -263,8 +264,12 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
                 <div className="flex flex-col lg:flex-row gap-8">
                    {/* Main Content */}
-                    <div className="flex-1 overflow-hidden">
-                       {activeModule && (course?.progress < 100 || showCelebration) ? (
+                    <div className="flex-1 overflow-hidden min-h-[400px]">
+                       {loading ? (
+                         <div className="h-full flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 text-primary/20 animate-spin" />
+                         </div>
+                       ) : activeModule && (course?.progress < 100 || showCelebration) ? (
                         <div className="bg-white rounded-[40px] border border-[#eef1f4] shadow-sm overflow-hidden">
                            <div className="p-10 border-b border-slate-50 bg-slate-50/30">
                               <div className="flex items-center gap-3 mb-4">

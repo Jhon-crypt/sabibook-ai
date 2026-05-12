@@ -5,9 +5,6 @@ import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
   BookOpen, 
-  Bot, 
-  ClipboardList, 
-  Award, 
   Bell, 
   Settings, 
   LogOut,
@@ -33,9 +30,6 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const navItems = [
     { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
     { label: "My Courses", href: "/courses", icon: <BookOpen className="w-5 h-5" /> },
-    { label: "AI Assistant", href: "/assistant", icon: <Bot className="w-5 h-5" /> },
-    { label: "Assignments", href: "/assignments", icon: <ClipboardList className="w-5 h-5" /> },
-    { label: "Certificates", href: "/certificates", icon: <Award className="w-5 h-5" /> },
     { label: "Notifications", href: "/notifications", icon: <Bell className="w-5 h-5" /> },
   ];
 
