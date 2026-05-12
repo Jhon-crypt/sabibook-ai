@@ -38,7 +38,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       <div className="flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center gap-2" onClick={onClose}>
           <div className="w-10 h-10 bg-[#FF5A5F] rounded-xl flex items-center justify-center shadow-lg shadow-red-100">
-            <span className="text-white font-bold text-xl font-serif italic">C</span>
+            <BookOpen className="text-white w-6 h-6" />
           </div>
           <span className="text-xl font-bold tracking-tight">SabiBook<span className="text-[#FF5A5F]">AI</span></span>
         </Link>

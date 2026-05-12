@@ -21,7 +21,8 @@ import {
   Rocket,
   Award,
   Globe,
-  ArrowRight
+  ArrowRight,
+  BarChart3
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -63,8 +64,8 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-[#eef1f4] px-6 lg:px-20 h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-            <span className="text-white font-bold text-lg font-serif italic">C</span>
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-all">
+            <BookOpen className="text-white w-6 h-6" />
           </div>
           <span className="text-xl font-bold tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
         </Link>
@@ -72,7 +73,6 @@ export default function LandingPage() {
           <a href="#how-it-works" className="hover:text-primary transition-colors">How it works</a>
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
           <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
-          <a href="#pricing" className="hover:text-primary transition-colors">Pricing</a>
         </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="text-sm font-bold text-[#666666] hover:text-primary transition-colors hidden sm:block">Login</Link>
@@ -286,12 +286,12 @@ export default function LandingPage() {
          
          <div className="container mx-auto max-w-6xl grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-               { icon: <Zap className="w-8 h-8 text-amber-500" />, title: "Instant Summaries", desc: "Convert 50 pages into 5 key points. Perfect for quick reviews before entering the hall." },
-               { icon: <CheckCircle2 className="w-8 h-8 text-green-500" />, title: "Quiz Generator", desc: "Let AI test you. Automatically generate exam-style questions from your own materials." },
-               { icon: <Globe className="w-8 h-8 text-blue-500" />, title: "Nigerian Context", desc: "SabiBook AI understands local academic slang and standard Nigerian curriculum structures." },
-               { icon: <Rocket className="w-8 h-8 text-teal-500" />, title: "Revision Paths", desc: "Get a personalized study plan based on how much of the syllabus you've actually covered." },
-               { icon: <ShieldCheck className="w-8 h-8 text-indigo-500" />, title: "Privacy First", desc: "Your notes are your intellectual property. We encrypt and secure every upload." },
-               { icon: <Users className="w-8 h-8 text-primary" />, title: "Collaborative Study", desc: "Share your AI-enhanced notes with course-mates to learn together (Coming Soon)." }
+               { icon: <Zap className="w-8 h-8 text-amber-500" />, title: "AI Curriculum", desc: "Instantly turn any PDF into a structured course with clear, digestible learning modules." },
+               { icon: <CheckCircle2 className="w-8 h-8 text-green-500" />, title: "Module Quizzes", desc: "Master every topic with automated quizzes that test your understanding of every module." },
+               { icon: <BarChart3 className="w-8 h-8 text-blue-500" />, title: "Mastery Tracking", desc: "Visualize your academic progress with a real-time mastery percentage for every course." },
+               { icon: <Clock className="w-8 h-8 text-teal-500" />, title: "Smart Resume", desc: "Never lose your place. We remember exactly where you stopped so you can pick up instantly." },
+               { icon: <Award className="w-8 h-8 text-indigo-500" />, title: "Achievements", desc: "Stay motivated with instant notifications celebrating your module and course completions." },
+               { icon: <Bot className="w-8 h-8 text-primary" />, title: "Personal AI Tutor", desc: "A constant learning companion that guides you through your curriculum 24/7." }
             ].map((f, i) => (
                <div key={i} className="p-10 rounded-[32px] bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-2xl hover:border-transparent transition-all group duration-500">
                   <div className="mb-8 w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
@@ -304,49 +304,7 @@ export default function LandingPage() {
          </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="py-32 bg-[#f8f9fa] px-6 relative">
-         <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-24">
-               <h2 className="text-sm font-black text-primary uppercase tracking-[0.3em] mb-6">Pricing</h2>
-               <h3 className="text-5xl md:text-6xl font-bold tracking-tight">Built by students, <br />for students.</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-               <div className="p-12 rounded-[40px] bg-white border border-[#eef1f4] flex flex-col justify-between group">
-                  <div>
-                     <h4 className="text-2xl font-bold mb-2">Student Plan</h4>
-                     <p className="text-[#6b7280] mb-8">Everything you need to sabi.</p>
-                     <div className="text-5xl font-black mb-10 text-[#1a1a1a]">₦0 <span className="text-lg font-bold text-slate-300">/ Free Forever</span></div>
-                     <ul className="space-y-4 mb-12">
-                        {["Up to 50 PDFs/month", "Unlimited AI Chat", "Basic Summaries", "Community Support"].map((item, i) => (
-                           <li key={i} className="flex items-center gap-3 text-sm font-semibold text-[#666666]">
-                              <CheckCircle2 className="w-4 h-4 text-green-500" /> {item}
-                           </li>
-                        ))}
-                     </ul>
-                  </div>
-                  <Link href="/signup" className="w-full py-5 bg-slate-50 text-[#1a1a1a] font-bold rounded-2xl text-center group-hover:bg-[#1a1a1a] group-hover:text-white transition-all">Start for Free</Link>
-               </div>
-               <div className="p-12 rounded-[40px] bg-white border-2 border-primary relative overflow-hidden flex flex-col justify-between">
-                  <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-black px-5 py-2 uppercase tracking-widest rounded-bl-2xl">Recommended</div>
-                  <div>
-                     <h4 className="text-2xl font-bold mb-2 text-primary">Sabi Pro</h4>
-                     <p className="text-[#6b7280] mb-8">For the serious high-achievers.</p>
-                     <div className="text-5xl font-black mb-10 text-[#1a1a1a]">₦2,500 <span className="text-lg font-bold text-slate-300">/ Session</span></div>
-                     <ul className="space-y-4 mb-12">
-                        {["Unlimited PDF Uploads", "Priority AI Responses", "Exam Pattern Analytics", "Advanced Quiz Generation", "Custom Study Paths"].map((item, i) => (
-                           <li key={i} className="flex items-center gap-3 text-sm font-semibold text-[#1a1a1a]">
-                              <CheckCircle2 className="w-4 h-4 text-primary" /> {item}
-                           </li>
-                        ))}
-                     </ul>
-                  </div>
-                  <Link href="/signup" className="w-full py-5 bg-primary text-white font-bold rounded-2xl text-center shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all">Go Pro Now</Link>
-               </div>
-            </div>
-         </div>
-      </section>
+
 
       {/* FAQ Section */}
       <section id="faq" className="py-32 bg-white px-6">
@@ -420,7 +378,6 @@ export default function LandingPage() {
                   <ul className="space-y-6 text-[15px] font-bold text-[#666666]">
                      <li><Link href="/dashboard" className="hover:text-primary transition-colors">Student Dashboard</Link></li>
                      <li><Link href="#features" className="hover:text-primary transition-colors">AI Features</Link></li>
-                     <li><Link href="#pricing" className="hover:text-primary transition-colors">Pricing Plans</Link></li>
                   </ul>
                </div>
 

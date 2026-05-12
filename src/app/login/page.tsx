@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Lock, ChevronRight, UserCircle, Loader2, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, ChevronRight, UserCircle, Loader2, Eye, EyeOff, BookOpen } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -61,7 +61,7 @@ export default function LoginPage() {
         <div className="text-center mb-10">
           <Link href="/" className="inline-flex items-center gap-2 mb-8 group">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-              <span className="text-white font-bold text-xl font-serif italic">C</span>
+              <BookOpen className="text-white w-6 h-6" />
             </div>
             <span className="text-2xl font-bold tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
           </Link>
