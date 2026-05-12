@@ -29,6 +29,9 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   const [mobileContentPage, setMobileContentPage] = useState(0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [showScoreModal, setShowScoreModal] = useState(false);
+  const [showRealAnswers, setShowRealAnswers] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchCourseData();
@@ -65,7 +68,10 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
     }
   };
 
-  const handleCompleteModule = async (index: number) => {
+  const handleSubmitQuiz = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    const index = activeModuleIndex;
     const module = modules[index];
     
     // Calculate Score for this module (1 point per correct answer)
@@ -107,16 +113,27 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .update({ progress })
         .eq("id", courseId);
 
-      // Move to next module if available
-      if (index < modules.length - 1) {
-        setActiveModuleIndex(index + 1);
-        setShowQuiz(false);
-        setQuizSubmitted(false);
-        setSelectedAnswers({});
-        setMobileContentPage(0);
-      }
+      setQuizSubmitted(true);
+      setShowScoreModal(true);
     } catch (err) {
       console.error("Error completing module:", err);
+      alert("Failed to submit quiz. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleNextModule = () => {
+    if (activeModuleIndex < modules.length - 1) {
+      setActiveModuleIndex(activeModuleIndex + 1);
+      setShowQuiz(false);
+      setQuizSubmitted(false);
+      setShowRealAnswers(false);
+      setSelectedAnswers({});
+      setMobileContentPage(0);
+      setShowScoreModal(false);
+    } else {
+      setShowScoreModal(false);
     }
   };
 
@@ -137,6 +154,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   const visibleParagraphs = paragraphs.slice(mobileContentPage * itemsPerPage, (mobileContentPage + 1) * itemsPerPage);
 
   return (
+    <>
     <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
        
@@ -147,6 +165,31 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
             user={user}
             onMenuClick={() => setIsSidebarOpen(true)}
           />
+
+          {/* Mobile Course Path Tabs (Fixed) */}
+          <div className="lg:hidden w-full bg-white border-b border-[#eef1f4] px-4 py-3 flex overflow-x-auto gap-3 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] shrink-0 z-10 relative shadow-sm">
+             {modules.map((mod, index) => (
+                <button
+                   key={`mobile-tab-${mod.id}`}
+                   onClick={() => {
+                     setActiveModuleIndex(index);
+                     setShowQuiz(false);
+                     setQuizSubmitted(false);
+                     setMobileContentPage(0);
+                   }}
+                   className={`snap-start shrink-0 px-5 py-2.5 rounded-full font-bold text-xs transition-all border-2 flex items-center gap-2 ${
+                     activeModuleIndex === index 
+                       ? 'bg-primary/10 border-primary text-primary' 
+                       : mod.is_completed 
+                         ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                         : 'bg-[#f8fafc] border-[#f8fafc] text-slate-500 hover:border-slate-200'
+                   }`}
+                >
+                   {mod.is_completed ? <CheckCircle2 className="w-3.5 h-3.5 shrink-0" /> : <PlayCircle className="w-3.5 h-3.5 shrink-0" />}
+                   <span className="whitespace-nowrap uppercase tracking-wider">Module {index + 1}</span>
+                </button>
+             ))}
+          </div>
           
           <div className="flex-1 overflow-y-auto p-8">
              <div className="max-w-5xl mx-auto">
@@ -159,31 +202,6 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                 <div className="flex flex-col lg:flex-row gap-8">
                    {/* Main Content */}
                    <div className="flex-1 overflow-hidden">
-                      {/* Mobile Course Path Tabs */}
-                      <div className="lg:hidden w-full flex overflow-x-auto gap-3 pb-2 mb-6 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                         {modules.map((mod, index) => (
-                            <button
-                               key={`mobile-tab-${mod.id}`}
-                               onClick={() => {
-                                 setActiveModuleIndex(index);
-                                 setShowQuiz(false);
-                                 setQuizSubmitted(false);
-                                 setMobileContentPage(0);
-                               }}
-                               className={`snap-start shrink-0 px-6 py-3.5 rounded-[20px] font-bold text-sm transition-all border-2 flex items-center gap-2.5 ${
-                                 activeModuleIndex === index 
-                                   ? 'bg-primary/5 border-primary text-primary shadow-sm shadow-red-100/50' 
-                                   : mod.is_completed 
-                                     ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                                     : 'bg-white border-[#eef1f4] text-slate-500 hover:border-slate-200'
-                               }`}
-                            >
-                               {mod.is_completed ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <PlayCircle className="w-4 h-4 shrink-0" />}
-                               <span className="whitespace-nowrap">Module {index + 1}</span>
-                            </button>
-                         ))}
-                      </div>
-
                       {activeModule ? (
                         <div className="bg-white rounded-[40px] border border-[#eef1f4] shadow-sm overflow-hidden">
                            <div className="p-10 border-b border-slate-50 bg-slate-50/30">
@@ -279,17 +297,27 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                                                 <button 
                                                   key={oIdx}
                                                   onClick={() => !quizSubmitted && setSelectedAnswers(prev => ({ ...prev, [qIdx]: oIdx }))}
-                                                  className={`p-5 rounded-2xl text-left font-bold transition-all border-2 ${
-                                                    selectedAnswers[qIdx] === oIdx 
-                                                      ? 'bg-primary/5 border-primary text-primary shadow-lg shadow-red-100/50' 
-                                                      : 'bg-white border-white text-slate-500 hover:border-slate-200'
-                                                  } ${
-                                                    quizSubmitted && oIdx === q.correctAnswer ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : ''
-                                                  } ${
-                                                    quizSubmitted && selectedAnswers[qIdx] === oIdx && oIdx !== q.correctAnswer ? 'bg-red-50 border-red-500 text-red-600' : ''
+                                                  className={`p-5 rounded-2xl text-left font-bold transition-all border-2 flex items-center justify-between gap-4 ${
+                                                    showRealAnswers 
+                                                      ? oIdx === q.correctAnswer
+                                                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-lg shadow-emerald-100'
+                                                        : selectedAnswers[qIdx] === oIdx
+                                                          ? 'bg-red-50 border-red-500 text-red-700 shadow-lg shadow-red-100'
+                                                          : 'bg-white border-slate-100 text-slate-300 opacity-60'
+                                                      : selectedAnswers[qIdx] === oIdx
+                                                        ? 'bg-primary/5 border-primary text-primary shadow-lg shadow-red-100/50' 
+                                                        : 'bg-white border-white text-slate-500 hover:border-slate-100 hover:shadow-sm'
                                                   }`}
                                                 >
-                                                   {option}
+                                                   <span>{option}</span>
+                                                   {showRealAnswers && oIdx === q.correctAnswer && (
+                                                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                                                   )}
+                                                   {showRealAnswers && selectedAnswers[qIdx] === oIdx && oIdx !== q.correctAnswer && (
+                                                     <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center shrink-0">
+                                                        <span className="text-white text-[10px] font-black">X</span>
+                                                     </div>
+                                                   )}
                                                 </button>
                                               ))}
                                            </div>
@@ -299,27 +327,20 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
                                    {!quizSubmitted ? (
                                      <button 
-                                       onClick={() => setQuizSubmitted(true)}
-                                       className="w-full mt-10 py-5 bg-primary text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                                       onClick={handleSubmitQuiz}
+                                       disabled={isSubmitting || Object.keys(selectedAnswers).length < (activeModule.quiz_questions?.length || 0)}
+                                       className="w-full mt-10 py-5 bg-primary text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                                      >
-                                        Check Answers
+                                        {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Submit Answers"}
                                      </button>
                                    ) : (
-                                     <div className="mt-10 animate-fade-in">
-                                        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 flex items-center justify-between mb-4 shadow-sm">
-                                           <span className="font-bold text-emerald-800 uppercase tracking-wider text-sm">Your Score</span>
-                                           <span className="text-2xl font-black text-emerald-600">
-                                              {activeModule.quiz_questions?.reduce((acc: number, q: any, idx: number) => acc + (selectedAnswers[idx] === q.correctAnswer ? 1 : 0), 0)} / {activeModule.quiz_questions?.length || 0}
-                                           </span>
-                                        </div>
-                                        <button 
-                                          onClick={() => handleCompleteModule(activeModuleIndex)}
-                                          className="w-full py-5 bg-emerald-500 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
-                                        >
-                                           Continue to Next Module
-                                           <CheckCircle2 className="w-5 h-5" />
-                                        </button>
-                                     </div>
+                                     <button 
+                                       onClick={handleNextModule}
+                                       className="w-full mt-10 py-5 bg-[#1a1a1a] text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+                                     >
+                                        {activeModuleIndex < modules.length - 1 ? "Continue to Next Module" : "Finish Course"}
+                                        <ChevronRight className="w-5 h-5" />
+                                     </button>
                                    )}
                                 </div>
                               )}
@@ -351,6 +372,8 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                                   setActiveModuleIndex(index);
                                   setShowQuiz(false);
                                   setQuizSubmitted(false);
+                                  setShowRealAnswers(false);
+                                  setShowScoreModal(false);
                                   setMobileContentPage(0);
                                 }}
                                 className={`w-full p-4 rounded-2xl text-left transition-all border-2 flex items-center gap-4 ${
@@ -391,5 +414,42 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
           </div>
        </main>
     </div>
+
+    {/* Score Modal */}
+    {showScoreModal && (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-fade-in">
+        <div className="bg-white rounded-[40px] p-10 max-w-sm w-full shadow-2xl text-center border border-[#eef1f4]">
+           <div className="w-20 h-20 bg-emerald-50 rounded-[30px] flex items-center justify-center mx-auto mb-6 shadow-inner shadow-emerald-100/50">
+              <Trophy className="w-10 h-10 text-emerald-500" />
+           </div>
+           <h3 className="text-3xl font-black text-[#1a1a1a] mb-2">Quiz Completed!</h3>
+           <p className="text-slate-500 mb-8 font-medium">You scored</p>
+           
+           <div className="text-6xl font-black text-emerald-500 mb-10">
+              {activeModule.quiz_score} <span className="text-3xl text-emerald-200">/ {activeModule.quiz_questions?.length || 0}</span>
+           </div>
+           
+           <div className="space-y-3">
+              <button 
+                onClick={() => {
+                  setShowScoreModal(false);
+                  setShowRealAnswers(true);
+                }}
+                className="w-full py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl hover:bg-slate-200 transition-all"
+              >
+                 Show Real Answers
+              </button>
+              <button 
+                onClick={handleNextModule}
+                className="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                 {activeModuleIndex < modules.length - 1 ? "Next Module" : "Finish Course"}
+                 <ChevronRight className="w-5 h-5" />
+              </button>
+           </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
