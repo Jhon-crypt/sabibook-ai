@@ -10,7 +10,8 @@ import {
   ArrowLeft,
   Loader2,
   Lock,
-  Trophy
+  Trophy,
+  PartyPopper
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
@@ -32,6 +33,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   const [showScoreModal, setShowScoreModal] = useState(false);
   const [showRealAnswers, setShowRealAnswers] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   useEffect(() => {
     fetchCourseData();
@@ -52,6 +54,9 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .single();
       
       setCourse(courseData);
+      if (courseData && typeof courseData.last_module_index === 'number') {
+        setActiveModuleIndex(courseData.last_module_index);
+      }
 
       // Fetch modules
       const { data: modulesData } = await supabase
@@ -63,6 +68,56 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
       setModules(modulesData || []);
     } catch (err) {
       console.error("Error fetching course board:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateLastModuleIndex = async (index: number) => {
+    try {
+      await supabase
+        .from("courses")
+        .update({ last_module_index: index })
+        .eq("id", courseId);
+    } catch (err) {
+      console.error("Error updating last module index:", err);
+    }
+  };
+
+  const handleRestartCourse = async () => {
+    try {
+      setLoading(true);
+      // Reset all modules for this course
+      const { error: moduleError } = await supabase
+        .from("course_modules")
+        .update({ is_completed: false, quiz_score: 0 })
+        .eq("course_id", courseId);
+
+      if (moduleError) throw moduleError;
+
+      // Reset course progress and last index
+      const { error: courseError } = await supabase
+        .from("courses")
+        .update({ progress: 0, last_module_index: 0 })
+        .eq("id", courseId);
+
+      if (courseError) throw courseError;
+
+      // Reset local states
+      setActiveModuleIndex(0);
+      setShowQuiz(false);
+      setQuizSubmitted(false);
+      setShowRealAnswers(false);
+      setSelectedAnswers({});
+      setMobileContentPage(0);
+      setShowScoreModal(false);
+      setShowCelebration(false);
+      
+      // Refresh data
+      await fetchCourseData();
+    } catch (err) {
+      console.error("Error restarting course:", err);
+      alert("Failed to restart course. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -113,6 +168,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .update({ progress })
         .eq("id", courseId);
 
+      setCourse(prev => ({ ...prev, progress }));
       setQuizSubmitted(true);
       setShowScoreModal(true);
     } catch (err) {
@@ -125,7 +181,9 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
   const handleNextModule = () => {
     if (activeModuleIndex < modules.length - 1) {
-      setActiveModuleIndex(activeModuleIndex + 1);
+      const nextIndex = activeModuleIndex + 1;
+      setActiveModuleIndex(nextIndex);
+      updateLastModuleIndex(nextIndex);
       setShowQuiz(false);
       setQuizSubmitted(false);
       setShowRealAnswers(false);
@@ -134,6 +192,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
       setShowScoreModal(false);
     } else {
       setShowScoreModal(false);
+      setShowCelebration(true);
     }
   };
 
@@ -173,8 +232,11 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                    key={`mobile-tab-${mod.id}`}
                    onClick={() => {
                      setActiveModuleIndex(index);
+                     updateLastModuleIndex(index);
                      setShowQuiz(false);
                      setQuizSubmitted(false);
+                     setShowRealAnswers(false);
+                     setShowScoreModal(false);
                      setMobileContentPage(0);
                    }}
                    className={`snap-start shrink-0 px-5 py-2.5 rounded-full font-bold text-xs transition-all border-2 flex items-center gap-2 ${
@@ -201,8 +263,8 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
                 <div className="flex flex-col lg:flex-row gap-8">
                    {/* Main Content */}
-                   <div className="flex-1 overflow-hidden">
-                      {activeModule ? (
+                    <div className="flex-1 overflow-hidden">
+                       {activeModule && (course?.progress < 100 || showCelebration) ? (
                         <div className="bg-white rounded-[40px] border border-[#eef1f4] shadow-sm overflow-hidden">
                            <div className="p-10 border-b border-slate-50 bg-slate-50/30">
                               <div className="flex items-center gap-3 mb-4">
@@ -353,9 +415,18 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                            </div>
                            <h2 className="text-4xl font-black text-[#1a1a1a] mb-4">Course Completed!</h2>
                            <p className="text-slate-400 text-lg max-w-sm mx-auto mb-10">You've mastered all the modules in this course. Great job!</p>
-                           <Link href="/courses" className="inline-flex py-4 px-10 bg-[#1a1a1a] text-white font-bold rounded-2xl hover:scale-[1.05] transition-all">
-                              Return to Library
-                           </Link>
+                           
+                           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                              <button 
+                                onClick={handleRestartCourse}
+                                className="inline-flex py-4 px-10 bg-emerald-500 text-white font-bold rounded-2xl hover:scale-[1.05] transition-all shadow-lg shadow-emerald-100"
+                              >
+                                 Retake Course
+                              </button>
+                              <Link href="/courses" className="inline-flex py-4 px-10 bg-[#1a1a1a] text-white font-bold rounded-2xl hover:scale-[1.05] transition-all">
+                                 Return to Library
+                              </Link>
+                           </div>
                         </div>
                       )}
                    </div>
@@ -370,6 +441,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                                 key={mod.id}
                                 onClick={() => {
                                   setActiveModuleIndex(index);
+                                  updateLastModuleIndex(index);
                                   setShowQuiz(false);
                                   setQuizSubmitted(false);
                                   setShowRealAnswers(false);
@@ -447,6 +519,63 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                  <ChevronRight className="w-5 h-5" />
               </button>
            </div>
+        </div>
+      </div>
+    )}
+
+    {/* Celebration Modal */}
+    {showCelebration && (
+      <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in overflow-hidden">
+        <style>{`
+          @keyframes confetti-fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+          .confetti-particle {
+            position: absolute;
+            animation: confetti-fall linear infinite;
+          }
+        `}</style>
+
+        {/* Confetti Particles */}
+        {[...Array(30)].map((_, i) => (
+          <div 
+            key={i}
+            className="confetti-particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `-20px`,
+              width: `${8 + Math.random() * 10}px`,
+              height: `${8 + Math.random() * 10}px`,
+              borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+              backgroundColor: ['#FF5A5F', '#4ADE80', '#60A5FA', '#FBBF24', '#A78BFA'][Math.floor(Math.random() * 5)],
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${3 + Math.random() * 4}s`
+            }}
+          />
+        ))}
+        
+        <div className="bg-white rounded-[50px] p-12 max-w-md w-full shadow-2xl text-center border border-[#eef1f4] relative animate-scale-in">
+           <div className="w-24 h-24 bg-red-50 rounded-[35px] flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-100/50 animate-bounce">
+              <PartyPopper className="w-12 h-12 text-[#FF5A5F]" />
+           </div>
+           
+           <h3 className="text-4xl font-black text-[#1a1a1a] mb-4">Congratulations!</h3>
+           <p className="text-slate-500 text-lg mb-10 leading-relaxed">
+              You've successfully completed the entire <strong>{course?.name}</strong> course. You're a rockstar! 🌟
+           </p>
+           
+           <div className="bg-slate-50 rounded-[30px] p-6 mb-10 border border-slate-100">
+              <p className="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Final Mastery Score</p>
+              <p className="text-5xl font-black text-[#1a1a1a]">{course?.progress}%</p>
+           </div>
+           
+           <button 
+             onClick={() => window.location.href = '/courses'}
+             className="w-full py-5 bg-[#FF5A5F] text-white text-lg font-bold rounded-2xl shadow-xl shadow-red-200/50 hover:scale-[1.02] active:scale-95 transition-all"
+           >
+              Return to My Courses
+           </button>
         </div>
       </div>
     )}
