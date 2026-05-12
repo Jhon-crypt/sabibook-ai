@@ -169,6 +169,34 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         .update({ progress })
         .eq("id", courseId);
 
+      // Get user ID safely
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const userId = authUser?.id;
+
+      if (userId) {
+        // Create notification for module completion
+        await supabase
+          .from("notifications")
+          .insert({
+             user_id: userId,
+             title: "Module Completed! 📚",
+             message: `Congratulations! You've successfully mastered "${module.title}" with a score of ${currentScore}.`,
+             type: "module_complete"
+          });
+
+        const allModulesFinished = newModules.length > 0 && newModules.every(m => m.is_completed);
+        if (allModulesFinished) {
+           await supabase
+             .from("notifications")
+             .insert({
+                user_id: userId,
+                title: "Course Mastery! 🏆",
+                message: `Incredible achievement! You have completed the entire "${course?.name}" course.`,
+                type: "course_complete"
+             });
+        }
+      }
+
       setCourse((prev: any) => ({ ...prev, progress }));
       setQuizSubmitted(true);
       setShowScoreModal(true);

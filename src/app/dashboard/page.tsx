@@ -299,18 +299,18 @@ export default function DashboardPage() {
            </div>
         </div>
 
-           {/* Second Row: Courses and AI Assistant */}
-           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+           {/* Row: My Courses */}
+           <div className="grid grid-cols-1 gap-6">
               {/* My Courses List */}
-              <div className="xl:col-span-2 p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col">
+              <div className="p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col">
                  <div className="flex items-center justify-between mb-8">
                     <h3 className="text-[16px] font-bold">My Courses</h3>
-                    <button className="text-[12px] font-bold text-[#FF5A5F] hover:underline">View All</button>
+                    <Link href="/courses" className="text-[12px] font-bold text-[#FF5A5F] hover:underline">View All</Link>
                  </div>
                  
-                 <div className="space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {courses.length === 0 ? (
-                      <div className="py-20 flex flex-col items-center justify-center text-center px-6">
+                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-center px-6">
                          <div className="w-24 h-24 bg-[#FFF0F0] rounded-[32px] flex items-center justify-center mb-8 shadow-lg shadow-red-50 relative animate-bounce-slow">
                             <BookOpen className="w-10 h-10 text-primary" />
                             <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-primary rounded-full border-4 border-white flex items-center justify-center">
@@ -333,14 +333,14 @@ export default function DashboardPage() {
                       courses.map((course) => (
                         <div key={course.id} className="group p-5 rounded-2xl border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer">
                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                              <div className="flex items-center gap-4">
                                  <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
                                     <BookOpen className="w-6 h-6 text-slate-400 group-hover:text-[#FF5A5F]" />
                                  </div>
                                  <div>
                                     <h4 className="font-bold text-[15px] line-clamp-1">{course.name}</h4>
-                                    <p className="text-[11px] text-[#aaaaaa] flex flex-wrap items-center gap-1.5 mt-1">
-                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs • {new Date(course.created_at).toLocaleDateString()}
+                                    <p className="text-[11px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
+                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs
                                     </p>
                                  </div>
                               </div>
@@ -364,132 +364,6 @@ export default function DashboardPage() {
                         </div>
                       ))
                     )}
-                 </div>
-              </div>
-
-              {/* AI Study Assistant Feature Box */}
-              <div className="p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col h-full min-h-[500px]">
-                 <div className="flex items-center justify-between mb-4">
-                    <span className="text-[14px] font-bold">AI Assistant</span>
-                    <div className="flex items-center gap-2">
-                       <input type="file" ref={fileInputRef} onChange={handleUpload} className="hidden" accept=".pdf" />
-                       <button 
-                         onClick={() => fileInputRef.current?.click()}
-                         className="text-[11px] font-bold text-[#FF5A5F] px-4 py-2 bg-[#FFF0F0] rounded-full hover:bg-[#FFD9D9] transition-all flex items-center gap-1.5"
-                       >
-                         <Plus className="w-3 h-3" />
-                         {isUploading ? "..." : "Upload"}
-                       </button>
-                    </div>
-                 </div>
-
-                 {/* Feature Buttons */}
-                 <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
-                    {[
-                      { id: "summary", label: "Summarize", icon: <Zap className="w-3 h-3" />, color: "bg-amber-50 text-amber-600 border-amber-100" },
-                      { id: "quiz", label: "Quiz", icon: <ClipboardList className="w-3 h-3" />, color: "bg-indigo-50 text-indigo-600 border-indigo-100" },
-                      { id: "simple", label: "Explain", icon: <Bot className="w-3 h-3" />, color: "bg-teal-50 text-teal-600 border-teal-100" },
-                    ].map((btn) => (
-                      <button
-                        key={btn.id}
-                        onClick={() => {
-                          if (btn.id === "summary") setQuestion("Can you summarize my uploaded notes into key bullet points?");
-                          if (btn.id === "quiz") setQuestion("Generate 5 practice exam questions from these notes.");
-                          if (btn.id === "simple") setQuestion("Explain this simply for a 100 level student.");
-                        }}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[11px] font-bold whitespace-nowrap transition-all hover:scale-105 active:scale-95 ${btn.color}`}
-                      >
-                        {btn.icon} {btn.label}
-                      </button>
-                    ))}
-                 </div>
-
-                 {/* Chat Messages */}
-                 <div className="flex-1 overflow-y-auto mb-4 space-y-4 pr-2 scrollbar-style">
-                   {messages.length === 0 ? (
-                      <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
-                         <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-2">
-                            <Bot className="w-6 h-6" />
-                         </div>
-                         <p className="text-xs">Ask anything about your notes!</p>
-                      </div>
-                   ) : (
-                      messages.map((msg, i) => (
-                        <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                          <div className={`p-4 rounded-2xl text-[13px] max-w-[95%] ${
-                            msg.role === "user" ? "bg-[#FF5A5F] text-white shadow-md shadow-red-100" : "bg-slate-50 border border-slate-100 text-slate-700"
-                          }`}>
-                            {msg.content}
-                            
-                            {msg.role === "ai" && msg.suggestedQuestions && msg.suggestedQuestions.length > 0 && (
-                              <div className="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-2">
-                                {msg.suggestedQuestions.map((q, idx) => (
-                                  <button
-                                    key={idx}
-                                    onClick={() => setQuestion(q)}
-                                    className="text-[10px] font-bold bg-white px-3 py-1.5 rounded-lg border border-slate-100 hover:border-red-200 hover:text-red-500 transition-all shadow-sm"
-                                  >
-                                    {q}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))
-                   )}
-                   {isAsking && (
-                     <div className="flex items-center gap-2 text-[11px] text-[#FF5A5F] font-bold">
-                        <Zap className="w-3 h-3 animate-pulse" /> AI is thinking...
-                     </div>
-                   )}
-                   <div ref={messagesEndRef} />
-                 </div>
-
-                 {/* Chat Input */}
-                 <form onSubmit={askQuestion} className="relative">
-                   <input 
-                     type="text" 
-                     value={question}
-                     onChange={(e) => setQuestion(e.target.value)}
-                     placeholder="Type your question..." 
-                     className="w-full bg-[#f8f9fa] border border-[#eef1f4] rounded-2xl py-4 pl-5 pr-14 text-sm focus:outline-none focus:border-red-200 transition-all font-medium"
-                   />
-                   <button type="submit" className="absolute right-2 top-2 w-10 h-10 bg-[#FF5A5F] rounded-xl flex items-center justify-center text-white hover:scale-105 transition-all">
-                      <Zap className="w-5 h-5 fill-current" />
-                   </button>
-                 </form>
-              </div>
-           </div>
-
-           {/* Results and Schedule Section */}
-           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-              {/* Recently Studied Results Table */}
-              <div className="xl:col-span-2 p-6 md:p-8 bg-white border border-[#eef1f4] rounded-[28px]">
-                 <h3 className="text-[14px] font-bold mb-6">Study History</h3>
-                 <div className="overflow-hidden text-center py-10 opacity-40">
-                    <Clock className="w-10 h-10 mx-auto mb-4" />
-                    <p className="text-xs font-bold uppercase tracking-widest">No recent sessions recorded</p>
-                 </div>
-              </div>
-
-              {/* Today's Schedule Card */}
-              <div className="p-8 bg-white border border-[#eef1f4] rounded-[28px] flex flex-col">
-                 <h3 className="text-[14px] font-bold mb-6">Today's Schedule</h3>
-                 <div className="flex-1 flex flex-col gap-4">
-                    {[
-                      { time: "07:00 AM", task: "Neural Networks for Beginners", color: "#6366f1" },
-                      { time: "09:00 AM", task: "Generative AI Learning Path", color: "#f59e0b" },
-                      { time: "11:00 AM", task: "AI Ethics & Responsibilities", color: "#10b981" }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-center gap-4">
-                         <span className="text-[11px] font-bold text-[#aaaaaa] w-16">{item.time}</span>
-                         <div className="flex-1 p-4 rounded-2xl border border-slate-50 bg-slate-50/50 flex items-center justify-between">
-                            <span className="text-[12px] font-bold">{item.task}</span>
-                            <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: item.color }} />
-                         </div>
-                      </div>
-                    ))}
                  </div>
               </div>
            </div>
