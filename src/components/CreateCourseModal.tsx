@@ -63,14 +63,32 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
             xhr.setRequestHeader("Authorization", `Bearer ${token}`);
           }
 
+          let intervalId: any;
+
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
-              const percent = Math.round((event.loaded / event.total) * 100);
+              // Scale upload to 30% of total progress
+              const percent = Math.round((event.loaded / event.total) * 30);
               setUploadProgress(percent);
+              
+              if (percent === 30 && !intervalId) {
+                 // Simulate AI generation progress from 30% to 95%
+                 let currentProgress = 30;
+                 intervalId = setInterval(() => {
+                    currentProgress += 1;
+                    if (currentProgress > 95) {
+                       clearInterval(intervalId);
+                    } else {
+                       setUploadProgress(currentProgress);
+                    }
+                 }, 400); // Slower interval for AI generation
+              }
             }
           };
 
           xhr.onload = () => {
+            if (intervalId) clearInterval(intervalId);
+            setUploadProgress(100);
             if (xhr.status >= 200 && xhr.status < 300) {
               resolve(JSON.parse(xhr.responseText));
             } else {
@@ -78,7 +96,10 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
             }
           };
 
-          xhr.onerror = () => reject(new Error("Network error"));
+          xhr.onerror = () => {
+            if (intervalId) clearInterval(intervalId);
+            reject(new Error("Network error"));
+          };
           xhr.send(formData);
         });
       }
@@ -162,18 +183,25 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
                            <span className="text-xs font-bold text-green-600 truncate max-w-[80%]">{selectedFile.name}</span>
                            
                            {/* Progress Overlay */}
-                           {creating && uploadProgress > 0 && uploadProgress < 100 && (
+                           {creating && uploadProgress > 0 && (
                              <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 animate-fade-in">
                                <div className="w-full max-w-[200px]">
                                  <div className="flex justify-between items-end mb-2">
-                                   <span className="text-[10px] font-black text-primary uppercase">Uploading...</span>
-                                   <span className="text-[10px] font-black text-primary">{uploadProgress}%</span>
+                                   <span className="text-[10px] font-black text-primary uppercase">
+                                      {uploadProgress >= 30 && uploadProgress < 100 ? "Analyzing AI..." : uploadProgress === 100 ? "Complete!" : "Uploading..."}
+                                   </span>
+                                   <span className="text-[10px] font-black text-primary">
+                                      {`${uploadProgress}%`}
+                                   </span>
                                  </div>
-                                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                 <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden relative">
                                    <div 
                                      className="h-full bg-primary transition-all duration-300" 
                                      style={{ width: `${uploadProgress}%` }}
                                    />
+                                   {uploadProgress >= 30 && uploadProgress < 100 && (
+                                     <div className="absolute inset-0 bg-white/30 animate-pulse" />
+                                   )}
                                  </div>
                                </div>
                              </div>
@@ -197,7 +225,7 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
                      <>
                        <Loader2 className="w-6 h-6 animate-spin" />
                        <span className="text-sm">
-                         {uploadProgress > 0 ? `Uploading PDF (${uploadProgress}%)` : "Initializing..."}
+                         {uploadProgress >= 30 && uploadProgress < 100 ? `Generating AI Curriculum (${uploadProgress}%)` : uploadProgress === 100 ? "Finalizing..." : uploadProgress > 0 ? `Uploading PDF (${uploadProgress}%)` : "Initializing..."}
                        </span>
                      </>
                    ) : (

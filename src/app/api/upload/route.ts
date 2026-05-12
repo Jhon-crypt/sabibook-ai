@@ -86,21 +86,21 @@ export async function POST(req: Request) {
       Your task is to transform the following PDF text into an EXTENSIVE, high-quality interactive course.
       
       CRITICAL INSTRUCTIONS:
-      1. Break the content into 5-7 detailed learning modules.
-      2. For each module, provide a HIGH-FIDELITY, EXTENSIVE explanation (at least 500-800 words of educational content).
+      1. Break the content into 3-5 detailed learning modules.
+      2. For each module, provide a concise but rich explanation (around 200-300 words of educational content).
       3. Use a professional, academic yet accessible tone.
-      4. For each module, generate exactly 5 high-quality multiple-choice questions.
+      4. For each module, generate exactly 3 high-quality multiple-choice questions.
       5. Each question must have 4 options and 1 correct answer.
       
       TEXT CONTENT FROM PDF:
-      ${data.text.substring(0, 15000)}
+      ${data.text.substring(0, 6000)}
       
       Output ONLY a JSON object with this exact structure:
       {
         "modules": [
           {
             "title": "Module Title",
-            "content": "Very detailed and long educational content...",
+            "content": "Detailed educational content...",
             "quiz_questions": [
               {
                 "question": "Question text",
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
         ],
         model: "openai/gpt-oss-120b",
         response_format: { type: "json_object" },
-        max_tokens: 4096, // Increase for more extensive content
+        max_tokens: 2500, // Reduced to fit within 8000 TPM limit
       });
 
       const curriculum = JSON.parse(completion.choices[0].message.content || '{"modules": []}');
