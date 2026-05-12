@@ -60,21 +60,40 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
   const handleCompleteModule = async (index: number) => {
     const module = modules[index];
+    
+    // Calculate Score for this module (1 point per correct answer)
+    let currentScore = 0;
+    module.quiz_questions?.forEach((q: any, qIdx: number) => {
+       if (selectedAnswers[qIdx] === q.correctAnswer) {
+          currentScore += 1;
+       }
+    });
+
     try {
       const { error } = await supabase
         .from("course_modules")
-        .update({ is_completed: true })
+        .update({ is_completed: true, quiz_score: currentScore })
         .eq("id", module.id);
 
       if (error) throw error;
 
       const newModules = [...modules];
       newModules[index].is_completed = true;
+      newModules[index].quiz_score = currentScore;
       setModules(newModules);
 
-      // Update course progress
-      const completedCount = newModules.filter(m => m.is_completed).length;
-      const progress = Math.round((completedCount / newModules.length) * 100);
+      // Update course progress based on total score / total possible questions
+      let totalQuestions = 0;
+      let totalScore = 0;
+      newModules.forEach(m => {
+        const qCount = m.quiz_questions?.length || 0;
+        totalQuestions += qCount;
+        if (m.is_completed) {
+           totalScore += (m.quiz_score || 0);
+        }
+      });
+      
+      const progress = totalQuestions > 0 ? Math.round((totalScore / totalQuestions) * 100) : 0;
       
       await supabase
         .from("courses")
@@ -199,13 +218,21 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                                         Check Answers
                                      </button>
                                    ) : (
-                                     <button 
-                                       onClick={() => handleCompleteModule(activeModuleIndex)}
-                                       className="w-full mt-10 py-5 bg-emerald-500 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
-                                     >
-                                        Continue to Next Module
-                                        <CheckCircle2 className="w-5 h-5" />
-                                     </button>
+                                     <div className="mt-10 animate-fade-in">
+                                        <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 flex items-center justify-between mb-4 shadow-sm">
+                                           <span className="font-bold text-emerald-800 uppercase tracking-wider text-sm">Your Score</span>
+                                           <span className="text-2xl font-black text-emerald-600">
+                                              {activeModule.quiz_questions?.reduce((acc: number, q: any, idx: number) => acc + (selectedAnswers[idx] === q.correctAnswer ? 1 : 0), 0)} / {activeModule.quiz_questions?.length || 0}
+                                           </span>
+                                        </div>
+                                        <button 
+                                          onClick={() => handleCompleteModule(activeModuleIndex)}
+                                          className="w-full py-5 bg-emerald-500 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3"
+                                        >
+                                           Continue to Next Module
+                                           <CheckCircle2 className="w-5 h-5" />
+                                        </button>
+                                     </div>
                                    )}
                                 </div>
                               )}

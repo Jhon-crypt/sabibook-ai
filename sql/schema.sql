@@ -199,6 +199,7 @@ CREATE TABLE IF NOT EXISTS course_modules (
     order_index INTEGER NOT NULL,
     quiz_questions JSONB, -- Array of {question, options, correctAnswer}
     is_completed BOOLEAN DEFAULT FALSE,
+    quiz_score INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
