@@ -26,6 +26,9 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   const [showQuiz, setShowQuiz] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [mobileContentPage, setMobileContentPage] = useState(0);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     fetchCourseData();
@@ -34,6 +37,10 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   const fetchCourseData = async () => {
     try {
       setLoading(true);
+      
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      setUser(authUser);
+
       // Fetch course details
       const { data: courseData } = await supabase
         .from("courses")
@@ -106,6 +113,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
         setShowQuiz(false);
         setQuizSubmitted(false);
         setSelectedAnswers({});
+        setMobileContentPage(0);
       }
     } catch (err) {
       console.error("Error completing module:", err);
@@ -121,13 +129,24 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
   }
 
   const activeModule = modules[activeModuleIndex];
+  
+  // Mobile Pagination Logic
+  const paragraphs = activeModule?.content?.split('\n').filter((p: string) => p.trim() !== '') || [];
+  const itemsPerPage = 2; // Show 2 paragraphs per "page" on mobile
+  const totalPages = Math.ceil(paragraphs.length / itemsPerPage);
+  const visibleParagraphs = paragraphs.slice(mobileContentPage * itemsPerPage, (mobileContentPage + 1) * itemsPerPage);
 
   return (
     <div className="flex h-screen bg-[#f8fafc] overflow-hidden">
-       <Sidebar isOpen={true} />
+       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
        
        <main className="flex-1 flex flex-col overflow-hidden">
-          <Header />
+          <Header 
+            title={course?.name || "Course Board"}
+            description="Master this module to advance."
+            user={user}
+            onMenuClick={() => setIsSidebarOpen(true)}
+          />
           
           <div className="flex-1 overflow-y-auto p-8">
              <div className="max-w-5xl mx-auto">
@@ -139,7 +158,32 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
                 <div className="flex flex-col lg:flex-row gap-8">
                    {/* Main Content */}
-                   <div className="flex-1">
+                   <div className="flex-1 overflow-hidden">
+                      {/* Mobile Course Path Tabs */}
+                      <div className="lg:hidden w-full flex overflow-x-auto gap-3 pb-2 mb-6 snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                         {modules.map((mod, index) => (
+                            <button
+                               key={`mobile-tab-${mod.id}`}
+                               onClick={() => {
+                                 setActiveModuleIndex(index);
+                                 setShowQuiz(false);
+                                 setQuizSubmitted(false);
+                                 setMobileContentPage(0);
+                               }}
+                               className={`snap-start shrink-0 px-6 py-3.5 rounded-[20px] font-bold text-sm transition-all border-2 flex items-center gap-2.5 ${
+                                 activeModuleIndex === index 
+                                   ? 'bg-primary/5 border-primary text-primary shadow-sm shadow-red-100/50' 
+                                   : mod.is_completed 
+                                     ? 'bg-emerald-50 border-emerald-100 text-emerald-600'
+                                     : 'bg-white border-[#eef1f4] text-slate-500 hover:border-slate-200'
+                               }`}
+                            >
+                               {mod.is_completed ? <CheckCircle2 className="w-4 h-4 shrink-0" /> : <PlayCircle className="w-4 h-4 shrink-0" />}
+                               <span className="whitespace-nowrap">Module {index + 1}</span>
+                            </button>
+                         ))}
+                      </div>
+
                       {activeModule ? (
                         <div className="bg-white rounded-[40px] border border-[#eef1f4] shadow-sm overflow-hidden">
                            <div className="p-10 border-b border-slate-50 bg-slate-50/30">
@@ -160,23 +204,66 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
 
                            <div className="p-10">
                               {!showQuiz ? (
-                                <>
-                                  <div className="prose prose-slate max-w-none mb-12">
-                                     {activeModule.content.split('\n').map((line: string, i: number) => (
-                                       <p key={i} className="text-slate-600 leading-relaxed text-lg mb-6">
+                                 <>
+                                  {/* Desktop View - Full Content */}
+                                  <div className="hidden md:block prose prose-slate max-w-none mb-12">
+                                     {paragraphs.map((line: string, i: number) => (
+                                       <p key={`desktop-${i}`} className="text-slate-600 leading-relaxed text-lg mb-6">
                                           {line}
                                        </p>
                                      ))}
                                   </div>
+
+                                  {/* Mobile View - Paginated Content */}
+                                  <div className="md:hidden mb-12">
+                                     <div className="prose prose-slate max-w-none min-h-[250px]">
+                                        {visibleParagraphs.map((line: string, i: number) => (
+                                          <p key={`mobile-${mobileContentPage}-${i}`} className="text-slate-600 leading-relaxed text-lg mb-6 animate-fade-in">
+                                             {line}
+                                          </p>
+                                        ))}
+                                     </div>
+                                     
+                                     {totalPages > 1 && (
+                                       <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+                                          <button 
+                                            onClick={() => setMobileContentPage(p => Math.max(0, p - 1))}
+                                            disabled={mobileContentPage === 0}
+                                            className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-slate-50 text-slate-600 hover:bg-slate-100"
+                                          >
+                                             Previous
+                                          </button>
+                                          <div className="flex items-center gap-1.5">
+                                             {Array.from({ length: totalPages }).map((_, i) => (
+                                                <div 
+                                                  key={i} 
+                                                  className={`h-2 rounded-full transition-all ${mobileContentPage === i ? 'w-4 bg-primary' : 'w-2 bg-slate-200'}`}
+                                                />
+                                             ))}
+                                          </div>
+                                          <button 
+                                            onClick={() => setMobileContentPage(p => Math.min(totalPages - 1, p + 1))}
+                                            disabled={mobileContentPage === totalPages - 1}
+                                            className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-primary/10 text-primary hover:bg-primary/20"
+                                          >
+                                             Next
+                                          </button>
+                                       </div>
+                                     )}
+                                  </div>
+
+                                  {/* Take Quiz Button */}
                                   <button 
                                     onClick={() => setShowQuiz(true)}
-                                    className="w-full py-5 bg-[#1a1a1a] text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 group"
+                                    className={`w-full py-5 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 group ${
+                                       totalPages > 1 && mobileContentPage < totalPages - 1 ? 'hidden md:flex bg-[#1a1a1a]' : 'flex bg-[#1a1a1a]'
+                                    }`}
                                   >
                                      Take Module Quiz
                                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                   </button>
-                                </>
-                              ) : (
+                                 </>
+                               ) : (
                                 <div className="animate-fade-in">
                                    <h3 className="text-2xl font-black text-[#1a1a1a] mb-8 flex items-center gap-3">
                                       <HelpCircle className="w-7 h-7 text-primary" />
@@ -253,8 +340,8 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                    </div>
 
                    {/* Module Navigation Sidebar */}
-                   <div className="w-full lg:w-80 flex flex-col gap-6">
-                      <div className="bg-white p-8 rounded-[40px] border border-[#eef1f4] shadow-sm">
+                   <div className="w-full lg:w-80 flex flex-col gap-6 lg:sticky lg:top-0 h-fit">
+                      <div className="hidden lg:block bg-white p-8 rounded-[40px] border border-[#eef1f4] shadow-sm">
                          <h3 className="text-lg font-black text-[#1a1a1a] mb-6">Course Path</h3>
                          <div className="space-y-4">
                             {modules.map((mod, index) => (
@@ -264,6 +351,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                                   setActiveModuleIndex(index);
                                   setShowQuiz(false);
                                   setQuizSubmitted(false);
+                                  setMobileContentPage(0);
                                 }}
                                 className={`w-full p-4 rounded-2xl text-left transition-all border-2 flex items-center gap-4 ${
                                   activeModuleIndex === index 
