@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 export async function POST(req: Request) {
   try {
     const { question } = await req.json();
-    
+
     // Get the latest PDF contents from the database as context
     const { data: pdfData } = await supabase
       .from("pdfs")
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     const context = pdfData?.map(p => p.content_text).join("\n\n---\n\n") || "No lecture notes uploaded yet.";
 
     const response = await groq.chat.completions.create({
-      model: "openai/gpt-oss-20b",
+      model: "openai/gpt-oss-120b",
       messages: [
         {
           role: "system",

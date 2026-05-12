@@ -1,7 +1,21 @@
 const pdfParse = require("pdf-parse/lib/pdf-parse.js");
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
+import Groq from "groq-sdk";
+
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 export async function POST(req: Request) {
+  const authHeader = req.headers.get("Authorization");
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+  // Create an authenticated client that respects RLS
+  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: authHeader ? { Authorization: authHeader } : {},
+    },
+  });
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -13,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    
+
     // 1. Parse PDF text with a custom options to avoid ENOENT test file error
     const data = await pdfParse(buffer, {
       pagerender: (pageData: any) => {
@@ -21,11 +35,11 @@ export async function POST(req: Request) {
           .then((textContent: any) => {
             let lastY, text = '';
             for (let item of textContent.items) {
-              if (lastY == item.transform[5] || !lastY){
+              if (lastY == item.transform[5] || !lastY) {
                 text += item.str;
               } else {
                 text += '\n' + item.str;
-              }    
+              }
               lastY = item.transform[5];
             }
             return text;
@@ -66,8 +80,71 @@ export async function POST(req: Request) {
 
     if (dbError) throw dbError;
 
-    return Response.json({ 
-      success: true, 
+    // 4. Generate Extensive AI Curriculum (Modules)
+    try {
+      const curriculumPrompt = `You are a world-class academic tutor and curriculum designer. 
+      Your task is to transform the following PDF text into an EXTENSIVE, high-quality interactive course.
+      
+      CRITICAL INSTRUCTIONS:
+      1. Break the content into 5-7 detailed learning modules.
+      2. For each module, provide a HIGH-FIDELITY, EXTENSIVE explanation (at least 500-800 words of educational content).
+      3. Use a professional, academic yet accessible tone.
+      4. For each module, generate exactly 5 high-quality multiple-choice questions.
+      5. Each question must have 4 options and 1 correct answer.
+      
+      TEXT CONTENT FROM PDF:
+      ${data.text.substring(0, 15000)}
+      
+      Output ONLY a JSON object with this exact structure:
+      {
+        "modules": [
+          {
+            "title": "Module Title",
+            "content": "Very detailed and long educational content...",
+            "quiz_questions": [
+              {
+                "question": "Question text",
+                "options": ["A", "B", "C", "D"],
+                "correctAnswer": 0
+              }
+            ]
+          }
+        ]
+      }`;
+
+      const completion = await groq.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: "You are a professional academic curriculum generator. You output extremely detailed educational content in strict JSON format."
+          },
+          { role: "user", content: curriculumPrompt }
+        ],
+        model: "openai/gpt-oss-120b",
+        response_format: { type: "json_object" },
+        max_tokens: 4096, // Increase for more extensive content
+      });
+
+      const curriculum = JSON.parse(completion.choices[0].message.content || '{"modules": []}');
+
+      if (curriculum.modules && curriculum.modules.length > 0) {
+        const modulesToInsert = curriculum.modules.map((mod: any, index: number) => ({
+          course_id: courseId,
+          user_id: userId,
+          title: mod.title,
+          content: mod.content,
+          order_index: index,
+          quiz_questions: mod.quiz_questions || mod.questions || [],
+        }));
+
+        await supabase.from("course_modules").insert(modulesToInsert);
+      }
+    } catch (aiError) {
+      console.error("AI Curriculum Generation Error:", aiError);
+    }
+
+    return Response.json({
+      success: true,
       pages: data.numpages,
       filePath: storageData?.path,
       textPreview: data.text.substring(0, 100) + "..."

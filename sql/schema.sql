@@ -189,6 +189,35 @@ SELECT id, COALESCE(raw_user_meta_data->>'full_name', 'Student'), email, 'manage
 FROM auth.users 
 ON CONFLICT (id) DO NOTHING;
 
+-- Course Modules (AI-generated curriculum steps)
+CREATE TABLE IF NOT EXISTS course_modules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    order_index INTEGER NOT NULL,
+    quiz_questions JSONB, -- Array of {question, options, correctAnswer}
+    is_completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Enable RLS
+ALTER TABLE course_modules ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+DROP POLICY IF EXISTS "Users can view own modules" ON course_modules;
+CREATE POLICY "Users can view own modules" ON course_modules FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own modules" ON course_modules;
+CREATE POLICY "Users can update own modules" ON course_modules FOR UPDATE USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own modules" ON course_modules;
+CREATE POLICY "Users can insert own modules" ON course_modules FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Index for performance
+CREATE INDEX IF NOT EXISTS idx_course_modules_course_id ON course_modules(course_id);
+
 -- ==========================================
 -- STORAGE BUCKET SETUP
 -- ==========================================

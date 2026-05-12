@@ -48,14 +48,20 @@ export default function CreateCourseModal({ isOpen, onClose, onSuccess, userId }
 
       // 2. Upload PDF if selected
       if (selectedFile && newCourse) {
-        await new Promise((resolve, reject) => {
+        await new Promise<void>(async (resolve, reject) => {
           const formData = new FormData();
           formData.append("file", selectedFile);
           formData.append("userId", userId);
           formData.append("courseId", newCourse.id);
 
           const xhr = new XMLHttpRequest();
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData.session?.access_token;
+
           xhr.open("POST", "/api/upload", true);
+          if (token) {
+            xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+          }
 
           xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {

@@ -19,6 +19,7 @@ import CreateCourseModal from "@/components/CreateCourseModal";
 import DeleteCourseModal from "@/components/DeleteCourseModal";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Image from "next/image";
 
 import Header from "@/components/Header";
@@ -69,6 +70,7 @@ export default function CoursesPage() {
 
   const handleDeleteCourse = (course: any, e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     setCourseToDelete(course);
     setShowDeleteModal(true);
   };
@@ -78,6 +80,31 @@ export default function CoursesPage() {
 
     setIsDeletingCourse(true);
     try {
+      // 1. Get all PDF paths for this course to clean up storage
+      const { data: pdfs } = await supabase
+        .from("pdfs")
+        .select("file_path")
+        .eq("course_id", courseToDelete.id);
+
+      // 2. Delete files from storage if they exist
+      if (pdfs && pdfs.length > 0) {
+        const filePaths = pdfs
+          .map(p => p.file_path)
+          .filter(p => p && !p.startsWith("pending/"));
+        
+        if (filePaths.length > 0) {
+          const { error: storageError } = await supabase.storage
+            .from("handouts")
+            .remove(filePaths);
+          
+          if (storageError) {
+            console.error("Error cleaning up storage:", storageError);
+            // We continue anyway to ensure the DB record is deleted
+          }
+        }
+      }
+
+      // 3. Delete course (cascades to pdfs table in DB)
       const { error } = await supabase
         .from("courses")
         .delete()
@@ -176,7 +203,11 @@ export default function CoursesPage() {
                 </div>
               ) : (
                 filteredCourses.map((course) => (
-                  <div key={course.id} className="group bg-white p-8 rounded-[32px] border border-[#eef1f4] hover:border-primary/20 hover:shadow-xl hover:shadow-red-50/50 transition-all cursor-pointer relative overflow-hidden">
+                  <div 
+                    onClick={() => router.push(`/courses/${course.id}`)}
+                    key={course.id} 
+                    className="group bg-white p-8 rounded-[32px] border border-[#eef1f4] hover:border-primary/20 hover:shadow-xl hover:shadow-red-50/50 transition-all cursor-pointer relative overflow-hidden"
+                  >
                      {/* Decorative background circle */}
                      <div className="absolute -right-8 -top-8 w-24 h-24 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-all" />
                      
@@ -218,7 +249,7 @@ export default function CoursesPage() {
                            />
                         </div>
                      </div>
-                  </div>
+                   </div>
                 ))
               )}
            </div>
