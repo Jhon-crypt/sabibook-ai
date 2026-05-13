@@ -308,9 +308,9 @@ export default function DashboardPage() {
                     <Link href="/courses" className="text-[12px] font-bold text-[#FF5A5F] hover:underline">View All</Link>
                  </div>
                  
-                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                 <div className="flex overflow-x-auto pb-6 -mx-4 px-4 gap-6 snap-x snap-mandatory scrollbar-hide">
                     {courses.length === 0 ? (
-                      <div className="col-span-full py-20 flex flex-col items-center justify-center text-center px-6">
+                      <div className="w-full flex-shrink-0 py-20 flex flex-col items-center justify-center text-center px-6">
                          <div className="w-24 h-24 bg-[#FFF0F0] rounded-[32px] flex items-center justify-center mb-8 shadow-lg shadow-red-50 relative animate-bounce-slow">
                             <BookOpen className="w-10 h-10 text-primary" />
                             <div className="absolute -right-2 -bottom-2 w-8 h-8 bg-primary rounded-full border-4 border-white flex items-center justify-center">
@@ -331,16 +331,20 @@ export default function DashboardPage() {
                       </div>
                     ) : (
                       courses.map((course) => (
-                        <div key={course.id} className="group p-5 rounded-2xl border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer">
-                           <div className="flex items-start justify-between mb-4">
+                        <div 
+                          key={course.id} 
+                          onClick={() => router.push(`/courses/${course.id}`)}
+                          className="min-w-[320px] flex-shrink-0 snap-start group p-6 rounded-[32px] border border-[#f1f3f5] hover:border-[#FF5A5F]/20 hover:bg-[#fff9f9] transition-all cursor-pointer bg-white"
+                        >
+                           <div className="flex items-start justify-between mb-6">
                               <div className="flex items-center gap-4">
-                                 <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center group-hover:bg-white transition-colors">
-                                    <BookOpen className="w-6 h-6 text-slate-400 group-hover:text-[#FF5A5F]" />
+                                 <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-white transition-colors border border-transparent group-hover:border-red-50">
+                                    <BookOpen className="w-7 h-7 text-slate-400 group-hover:text-[#FF5A5F]" />
                                  </div>
                                  <div>
-                                    <h4 className="font-bold text-[15px] line-clamp-1">{course.name}</h4>
-                                    <p className="text-[11px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
-                                       <FileText className="w-3 h-3" /> {course.pdfs?.length || 0} PDFs
+                                    <h4 className="font-bold text-[17px] line-clamp-1">{course.name}</h4>
+                                    <p className="text-[12px] text-[#aaaaaa] flex items-center gap-1.5 mt-1">
+                                       <FileText className="w-3.5 h-3.5" /> {course.pdfs?.length || 0} Study Materials
                                     </p>
                                  </div>
                               </div>
@@ -349,14 +353,14 @@ export default function DashboardPage() {
                               </button>
                            </div>
                            
-                           <div>
-                              <div className="flex justify-between items-end mb-2">
-                                 <span className="text-[11px] font-bold text-[#888888]">Progress</span>
-                                 <span className="text-[11px] font-black text-[#FF5A5F]">{course.progress || 0}%</span>
+                           <div className="mt-auto">
+                              <div className="flex justify-between items-end mb-3">
+                                 <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">Course Mastery</span>
+                                 <span className="text-[13px] font-black text-[#FF5A5F]">{course.progress || 0}%</span>
                               </div>
-                              <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                              <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                                  <div 
-                                   className="h-full bg-[#FF5A5F] rounded-full transition-all duration-1000" 
+                                   className="h-full bg-[#FF5A5F] rounded-full transition-all duration-1000 shadow-[0_0_12px_rgba(255,90,95,0.3)]" 
                                    style={{ width: `${course.progress || 0}%` }} 
                                  />
                               </div>
