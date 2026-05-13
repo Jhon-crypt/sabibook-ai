@@ -503,16 +503,7 @@ export default function CourseBoard({ params }: { params: Promise<{ id: string }
                          </div>
                       </div>
 
-                      <div className="bg-[#1a1a1a] p-8 rounded-[40px] text-white overflow-hidden relative group">
-                         <div className="relative z-10">
-                            <h3 className="text-lg font-black mb-2">Need Help?</h3>
-                            <p className="text-slate-400 text-xs mb-6 leading-relaxed">Stuck on a concept? Our AI tutor is always here to help you explain things further.</p>
-                            <Link href="/dashboard" className="inline-flex py-3 px-6 bg-primary text-white text-xs font-bold rounded-xl hover:bg-white hover:text-[#1a1a1a] transition-all">
-                               Chat with AI
-                            </Link>
-                         </div>
-                         <BookOpen className="absolute -right-4 -bottom-4 w-24 h-24 text-white/5 rotate-12 group-hover:scale-110 transition-transform" />
-                      </div>
+                      
                    </div>
                 </div>
              </div>
