@@ -6,7 +6,6 @@ import {
   LayoutDashboard, 
   BookOpen, 
   Bell, 
-  Settings, 
   LogOut,
   X
 } from "lucide-react";
@@ -70,11 +69,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       </nav>
 
       <div className="flex flex-col gap-2">
-         <p className="text-[10px] font-bold text-[#aaaaaa] uppercase tracking-widest pl-3 mb-2">Settings</p>
-         <div className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#666666] hover:bg-slate-50 cursor-pointer">
-            <Settings className="w-5 h-5" />
-            <span className="text-[14px] font-semibold">Settings</span>
-         </div>
+
          <div 
            onClick={handleLogout}
            className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 cursor-pointer transition-all mt-auto"

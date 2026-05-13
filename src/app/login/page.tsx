@@ -78,7 +78,7 @@ export default function LoginPage() {
 
           <form className="space-y-5" onSubmit={handleLogin}>
             <div>
-              <label className="block text-[13px] font-bold text-[#1a1a1a] mb-2 pl-1 uppercase tracking-wider">Email or Matric Number</label>
+              <label className="block text-[13px] font-bold text-[#1a1a1a] mb-2 pl-1 uppercase tracking-wider">Email</label>
               <div className="relative group">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
                   <UserCircle className="w-5 h-5" />
