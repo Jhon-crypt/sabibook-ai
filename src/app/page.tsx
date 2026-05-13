@@ -22,7 +22,9 @@ import {
   Award,
   Globe,
   ArrowRight,
-  BarChart3
+  BarChart3,
+  User,
+  GraduationCap
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -306,6 +308,8 @@ export default function LandingPage() {
 
 
 
+
+
       {/* FAQ Section */}
       <section id="faq" className="py-32 bg-white px-6">
          <div className="container mx-auto max-w-4xl">
@@ -333,7 +337,6 @@ export default function LandingPage() {
          </div>
       </section>
 
-      {/* Final Call to Action */}
       <section className="py-40 bg-white px-6 relative overflow-hidden">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
          <div className="container mx-auto max-w-4xl text-center relative z-10">
@@ -349,14 +352,76 @@ export default function LandingPage() {
          </div>
       </section>
 
+      {/* Developer Hero Section */}
+      <section className="py-32 bg-[#1a1a1a] text-white px-6 relative overflow-hidden">
+         <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] -z-0" />
+         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/10 rounded-full blur-[120px] -z-0" />
+         
+         <div className="container mx-auto max-w-7xl relative z-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
+               <div className="animate-slide-up">
+                  <div className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl mb-8">
+                     <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                     <span className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">Student Innovation Project</span>
+                  </div>
+                  <h2 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.1]">
+                     Built for students, <br />
+                     <span className="text-primary italic">by a student.</span>
+                  </h2>
+                  <p className="text-xl text-slate-400 mb-12 leading-relaxed max-w-xl">
+                     SabiBook AI was designed and developed by <span className="text-white font-bold">Ninola Oladele</span>, a Computer Science student at LASUSTECH, with a vision to revolutionize how Nigerian students interact with their study materials.
+                  </p>
+                  
+                  <div className="p-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[32px] flex items-center gap-6 group">
+                     <div className="w-20 h-20 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30 group-hover:scale-110 transition-transform">
+                        <User className="w-10 h-10 text-primary" />
+                     </div>
+                     <div>
+                        <h4 className="text-2xl font-black tracking-tight mb-1">Ninola Oladele</h4>
+                        <div className="flex items-center gap-2 text-slate-400 font-bold text-sm">
+                           <GraduationCap className="w-4 h-4 text-primary" />
+                           LASUSTECH Computer Science
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className="animate-slide-up [animation-delay:0.2s]">
+                  <h3 className="text-[11px] font-black uppercase tracking-[0.4em] text-primary mb-10">The Technology Stack</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     {[
+                        { name: "Next.js 14", detail: "The modern framework for powerful web apps.", icon: <Zap className="w-5 h-5" /> },
+                        { name: "Supabase", detail: "Real-time database and secure authentication.", icon: <ShieldCheck className="w-5 h-5" /> },
+                        { name: "Gemini AI", detail: "Advanced neural intelligence for curriculum analysis.", icon: <Sparkles className="w-5 h-5" /> },
+                        { name: "Tailwind CSS", detail: "Responsive, high-fidelity design system.", icon: <Bot className="w-5 h-5" /> }
+                     ].map((tech, i) => (
+                        <div key={i} className="p-8 rounded-[32px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all group">
+                           <div className="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-primary">
+                              {tech.icon}
+                           </div>
+                           <h4 className="text-lg font-black mb-2">{tech.name}</h4>
+                           <p className="text-sm text-slate-500 leading-relaxed font-medium">{tech.detail}</p>
+                        </div>
+                     ))}
+                  </div>
+                  <div className="mt-12 flex items-center gap-4 text-slate-600 font-black text-[10px] uppercase tracking-[0.5em]">
+                     <div className="h-[1px] flex-1 bg-white/10" />
+                     100% Open Academic Innovation
+                     <div className="h-[1px] flex-1 bg-white/10" />
+                  </div>
+               </div>
+            </div>
+         </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-32 bg-white border-t border-[#eef1f4] px-6">
          <div className="container mx-auto max-w-7xl">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-20 mb-20">
                <div className="col-span-1 lg:col-span-2">
                   <Link href="/" className="flex items-center gap-2 mb-8">
-                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                        <span className="text-white font-bold text-xl italic">C</span>
+                     <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                        <BookOpen className="text-white w-6 h-6" />
                      </div>
                      <span className="text-2xl font-black tracking-tighter">SabiBook<span className="text-primary">AI</span></span>
                   </Link>
@@ -392,8 +457,8 @@ export default function LandingPage() {
             </div>
             
             <div className="pt-20 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-10 text-[11px] font-black text-[#aaaaaa] uppercase tracking-[0.3em]">
-               <p>© 2026 SABIBOOK AI. ALL RIGHTS RESERVED.</p>
-               <p className="flex items-center gap-2 italic">Designed with ❤️ for Nigeria's brightest minds</p>
+               <p>© 2026 SABIBOOK AI. BUILT BY NINOLA OLADELE (LASUSTECH).</p>
+               <p className="flex items-center gap-2 italic">A Computer Science Student Project ❤️</p>
             </div>
          </div>
       </footer>
